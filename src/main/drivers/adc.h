@@ -18,7 +18,7 @@
 #pragma once
 
 #include "drivers/io_types.h"
-
+//todo
 typedef enum {
     ADC_BATTERY = 0,
     ADC_RSSI = 1,

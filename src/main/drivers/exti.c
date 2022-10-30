@@ -130,7 +130,7 @@ void EXTIConfig(IO_t io, extiCallbackRec_t *cb, int irqPriority, exint_polarity_
     EXTIInit.line_polarity = trigger;
     EXTIInit.line_enable = TRUE;
     exint_init(&EXTIInit);
-
+     
     if (extiGroupPriority[group] > irqPriority) {
         extiGroupPriority[group] = irqPriority;
 

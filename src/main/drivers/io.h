@@ -70,8 +70,6 @@
 #define IOCFG_IN_FLOATING    IO_CONFIG(GPIO_Mode_IN,  0, 0,             GPIO_PuPd_NOPULL)
 #define IOCFG_IPU_25         IO_CONFIG(GPIO_Mode_IN,  GPIO_Speed_25MHz, 0, GPIO_PuPd_UP)
 
-<<<<<<< HEAD
-=======
 #elif defined(AT32F4)
 
 #define IO_CONFIG(mode, speed, otype, pupd) ((mode) | ((speed) << 2) | ((otype) << 4) | ((pupd) << 5))
@@ -90,7 +88,6 @@
 #define IOCFG_IN_FLOATING    IO_CONFIG(GPIO_MODE_INPUT,  0, 0,             GPIO_PULL_NONE)
 #define IOCFG_IPU_25         IO_CONFIG(GPIO_MODE_INPUT,  0, 0, GPIO_PULL_UP)
 
->>>>>>> 初始化At32
 #elif defined(UNIT_TEST)
 
 # define IOCFG_OUT_PP         0

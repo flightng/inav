@@ -57,8 +57,6 @@
 #define U_ID_2 (*(uint32_t*)0x1ff0f428)
 #endif
 
-<<<<<<< HEAD
-=======
 #elif defined(AT32F4)
 // todo 
 #include "stm32f7xx.h"
@@ -75,7 +73,6 @@
 #define U_ID_1 (*(uint32_t*)0x1ff07a14)
 #define U_ID_2 (*(uint32_t*)0x1ff07a18)
   
->>>>>>> 初始化At32
 #elif defined(STM32F4)
 #include "stm32f4xx.h"
 

@@ -111,11 +111,7 @@
 
 // *************** UART *****************************
 #define USE_VCP
-<<<<<<< HEAD
 #define USB_DETECT_PIN          PC14
-=======
-#define USB_DETECT_PIN          PC15
->>>>>>> 初始化At32
 #define USE_USB_DETECT
 
 #define USE_UART1

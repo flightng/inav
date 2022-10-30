@@ -113,8 +113,12 @@ void RCC_ResetCmd(rccPeriphTag_t periphTag, FunctionalState NewState)
         break;
 #endif
 //  crm_periph_reset(CRM_ADC_PERIPH_RESET, TRUE);
+<<<<<<< HEAD
 
+=======
+>>>>>>> 初始化At32
 
+   
     case RCC_APB2:
         RCC_BIT_CMD(RCC->APB2RSTR, mask, NewState);
         break;

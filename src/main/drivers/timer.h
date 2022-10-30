@@ -29,7 +29,7 @@
 
 typedef uint16_t captureCompare_t;        // 16 bit on both 103 and 303, just register access must be 32bit sometimes (use timCCR_t)
 
-#if defined(STM32F4) || defined(STM32F7) || defined(STM32H7)
+#if defined(STM32F4) || defined(STM32F7) || defined(STM32H7)|| defined(AT32F43x)
 typedef uint32_t timCCR_t;
 typedef uint32_t timCCER_t;
 typedef uint32_t timSR_t;
@@ -43,7 +43,7 @@ typedef uint32_t timCNT_t;
 #error "Unknown CPU defined"
 #endif
 
-#if defined(STM32F4)
+#if defined(STM32F4)|| defined(AT32F43x)
 #define HARDWARE_TIMER_DEFINITION_COUNT 14
 #elif defined(STM32F7)
 #define HARDWARE_TIMER_DEFINITION_COUNT 14
@@ -52,7 +52,7 @@ typedef uint32_t timCNT_t;
 #else
 #error "Unknown CPU defined"
 #endif
-
+//  tmr_type todo
 typedef struct timerDef_s {
     TIM_TypeDef   * tim;
     rccPeriphTag_t  rcc;

@@ -11,8 +11,10 @@ void RCC_ClockCmd(rccPeriphTag_t periphTag, FunctionalState NewState)
     uint32_t mask = 1 << (periphTag & 0x1f);
 
     switch (tag) {
-
-#if defined(STM32F4) || defined(STM32F7) || defined(STM32H7)
+//ahben1 crm
+//ahben2
+//apb1en
+#if defined(STM32F4) || defined(STM32F7) || defined(STM32H7) || defined(AT32F4) 
     case RCC_AHB1:
         RCC_BIT_CMD(RCC->AHB1ENR, mask, NewState);
         break;
@@ -47,7 +49,8 @@ void RCC_ClockCmd(rccPeriphTag_t periphTag, FunctionalState NewState)
         RCC_BIT_CMD(RCC->APB4ENR, mask, NewState);
         break;
 #endif
-
+//apb1en
+//apb2en
 #if !(defined(STM32H7) || defined(STM32G4))
     case RCC_APB1:
         RCC_BIT_CMD(RCC->APB1ENR, mask, NewState);
@@ -67,7 +70,7 @@ void RCC_ResetCmd(rccPeriphTag_t periphTag, FunctionalState NewState)
     uint32_t mask = 1 << (periphTag & 0x1f);
 
     switch (tag) {
-
+//ahbrst1 apb1rst 
 #if defined(STM32F4) || defined(STM32F7) || defined(STM32H7)
     case RCC_AHB1:
         RCC_BIT_CMD(RCC->AHB1RSTR, mask, NewState);
@@ -109,6 +112,8 @@ void RCC_ResetCmd(rccPeriphTag_t periphTag, FunctionalState NewState)
         RCC_BIT_CMD(RCC->APB1RSTR, mask, NewState);
         break;
 #endif
+//  crm_periph_reset(CRM_ADC_PERIPH_RESET, TRUE);
+
 
     case RCC_APB2:
         RCC_BIT_CMD(RCC->APB2RSTR, mask, NewState);

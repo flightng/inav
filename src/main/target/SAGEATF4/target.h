@@ -28,7 +28,7 @@
  * PA15	JTDI
  * PB4 JREST
  * pb3 swo /DTO
- *
+
  * other pin
  *
  * PB2 ->BOOT0 button

@@ -1,1 +1,0 @@
-target_at32f4xx(CARLAT437)

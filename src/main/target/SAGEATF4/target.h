@@ -19,7 +19,7 @@
 
 #define TARGET_BOARD_IDENTIFIER "ATF4"
 
-#define USBD_PRODUCT_STRING  "CARLAT437"
+#define USBD_PRODUCT_STRING  "SAGEATF4"
 
 /**********swd debuger reserved *****************
  *
@@ -28,7 +28,7 @@
  * PA15	JTDI
  * PB4 JREST
  * pb3 swo /DTO
- *
+
  * other pin
  *
  * PB2 ->BOOT0 button

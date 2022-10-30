@@ -8,7 +8,7 @@ typedef struct ioDef_s {
     ioTag_t tag;
 } ioDef_t;
 
-#if defined(AT32F4)  //TODO 
+#if defined(AT32F43x)  //TODO 
 typedef struct ioRec_s {
     gpio_type *gpio;
     uint16_t pin;
@@ -37,7 +37,7 @@ int IO_GPIOPinIdx(IO_t io);
 int IO_GPIO_PinSource(IO_t io);
 int IO_GPIO_PortSource(IO_t io);
 
-#if defined(STM32F4)
+#if defined(STM32F4) || defined(AT32F43x)
 int IO_EXTI_PortSourceGPIO(IO_t io);
 int IO_EXTI_PinSource(IO_t io);
 #endif

@@ -57,7 +57,7 @@
 #define U_ID_2 (*(uint32_t*)0x1ff0f428)
 #endif
 
-#elif defined(AT32F4)
+#elif defined(AT32F43x)
 // todo 
 #include "stm32f7xx.h"
 #include "stm32f7xx_hal.h"
@@ -69,10 +69,16 @@
 #include "stm32f7xx_ll_bus.h"
 #include "stm32f7xx_ll_tim.h"
 
-#define U_ID_0 (*(uint32_t*)0x1ff07a10)
+#define U_ID_0 (*(uint32_t*)0x1fff7a10)
 #define U_ID_1 (*(uint32_t*)0x1ff07a14)
 #define U_ID_2 (*(uint32_t*)0x1ff07a18)
-  
+typedef enum
+{
+  DISABLE = 0,
+  ENABLE = !DISABLE
+} FunctionalState;
+#define IS_FUNCTIONAL_STATE(STATE) (((STATE) == DISABLE) || ((STATE) == ENABLE))
+
 #elif defined(STM32F4)
 #include "stm32f4xx.h"
 

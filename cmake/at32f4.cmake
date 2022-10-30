@@ -1,10 +1,10 @@
 include(cortex-m4f)
 
-set(STM32F4_STDPERIPH_DIR "${MAIN_LIB_DIR}/main/AT32F4/Drivers/AT32F4xx_StdPeriph_Driver")
-set(STM32F4_CMSIS_DEVICE_DIR "${MAIN_LIB_DIR}/main/AT32F4/Drivers/CMSIS/Device/ST/AT32F4xx")
-set(STM32F4_CMSIS_DRIVERS_DIR "${MAIN_LIB_DIR}/main/AT32F4/Drivers/CMSIS")
+set(STM32F4_STDPERIPH_DIR "${MAIN_LIB_DIR}/main/AT32F43x/Drivers/AT32F4xx_StdPeriph_Driver")
+set(STM32F4_CMSIS_DEVICE_DIR "${MAIN_LIB_DIR}/main/AT32F43x/Drivers/CMSIS/Device/ST/AT32F4xx")
+set(STM32F4_CMSIS_DRIVERS_DIR "${MAIN_LIB_DIR}/main/AT32F43x/Drivers/CMSIS")
 # set(STM32F4_VCP_DIR "${MAIN_SRC_DIR}/vcpf4")
-
+# todo 
 set(STM32F4_STDPERIPH_SRC_EXCLUDES
     stm32f4xx_can.c
     stm32f4xx_cec.c

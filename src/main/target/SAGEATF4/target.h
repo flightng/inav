@@ -19,7 +19,7 @@
 
 #define TARGET_BOARD_IDENTIFIER "ATF4"
 
-#define USBD_PRODUCT_STRING  "CARLAT437"
+#define USBD_PRODUCT_STRING  "SAGEATF4"
 
 /**********swd debuger reserved *****************
  *

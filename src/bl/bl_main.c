@@ -177,6 +177,10 @@ void bootloader_jump_to_app(void)
 #if defined(STM32F4)
     RCC_APB1PeriphResetCmd(~0, DISABLE);
     RCC_APB2PeriphResetCmd(~0, DISABLE);
+
+    //void crm_ahb_div_set(crm_ahb_div_type value);
+//void crm_apb1_div_set(crm_apb1_div_type value);
+//void crm_apb2_div_set(crm_apb2_div_type value);
 #elif defined(STM32F7)
     RCC->APB1ENR = 0;
     RCC->APB1LPENR = 0;

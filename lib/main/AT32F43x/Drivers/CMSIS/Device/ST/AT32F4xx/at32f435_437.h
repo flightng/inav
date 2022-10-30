@@ -72,7 +72,7 @@ extern "C" {
     defined (AT32F435ZCT7) || defined (AT32F435ZGT7) || defined (AT32F435ZMT7)
 
     #define AT32F435xx
-    #define AT32F4
+    #define AT32F43x
 #endif
 
 #if defined (AT32F437RCT7) || defined (AT32F437RGT7) || defined (AT32F437RMT7) || \
@@ -80,7 +80,7 @@ extern "C" {
     defined (AT32F437ZCT7) || defined (AT32F437ZGT7) || defined (AT32F437ZMT7)
 
     #define AT32F437xx
-    #define AT32F4
+    #define AT32F43x
 #endif
 
 #ifndef USE_STDPERIPH_DRIVER
@@ -380,6 +380,8 @@ typedef __I uint8_t  vuc8;    /*!< read only */
 typedef enum {RESET = 0, SET = !RESET} flag_status;
 typedef enum {FALSE = 0, TRUE = !FALSE} confirm_state;
 typedef enum {ERROR = 0, SUCCESS = !ERROR} error_status;
+
+
 
 /**
   * @}

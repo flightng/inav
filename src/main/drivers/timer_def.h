@@ -18,7 +18,7 @@
 #pragma once
 
 #include "drivers/dma.h"
-
+// todo need redo
 // Macros expand to keep DMA descriptor table compatible with Betaflight
 #define DEF_TIM_DMAMAP(variant, timch) CONCAT(DEF_TIM_DMAMAP__, PP_CALL(CONCAT(DEF_TIM_DMAMAP_VARIANT__, variant), CONCAT(DEF_TIM_DMA__, DEF_TIM_TCH2BTCH(timch)), DMA_VARIANT_MISSING, DMA_VARIANT_MISSING))
 #define DEF_TIM_DMAMAP_VARIANT__0(_0, ...)                                                                      _0
@@ -82,6 +82,8 @@
     #include "timer_def_stm32f7xx.h"
 #elif defined(STM32H7)
     #include "timer_def_stm32h7xx.h"
+#elif defined(AT32F43x)
+    #include "timer_def_at32f43x.h"
 #else
     #error "Unknown CPU defined"
 #endif

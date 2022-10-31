@@ -20,10 +20,30 @@
 #if defined(USE_HAL_DRIVER)
 #  define IMPL_TIM_IT_UPDATE_INTERRUPT      TIM_IT_UPDATE
 #  define TIM_IT_CCx(chIdx)                 (TIM_IT_CC1 << (chIdx))
+#elif defined(AT32F43x) // todo
+#  define IMPL_TIM_IT_UPDATE_INTERRUPT      TMR_OVF_INT
+#  define TIM_IT_CCx(chIdx)                 (TMR_C1_INT << (chIdx))
+
+
+#define _TIM_IRQ_HANDLER2(name, i, j)                                   \
+    void name(void)                                                     \
+    {                                                                   \
+        impl_timerCaptureCompareHandler(TMR ## i, timerCtx[i - 1]); \
+        impl_timerCaptureCompareHandler(TMR ## j, timerCtx[j - 1]); \
+    } struct dummy
+
+#define _TIM_IRQ_HANDLER(name, i)                                       \
+    void name(void)                                                     \
+    {                                                                   \
+        impl_timerCaptureCompareHandler(TMR ## i, timerCtx[i - 1]); \
+    } struct dummy
+
+uint8_t lookupTimerIndex(const tmr_type *tim);
+void impl_timerCaptureCompareHandler(tmr_type *tim, timHardwareContext_t * timerCtx);
+// end at32 
 #else
 #  define IMPL_TIM_IT_UPDATE_INTERRUPT      TIM_IT_Update
 #  define TIM_IT_CCx(chIdx)                 (TIM_IT_CC1 << (chIdx))
-#endif
 
 #define _TIM_IRQ_HANDLER2(name, i, j)                                   \
     void name(void)                                                     \
@@ -39,11 +59,13 @@
     } struct dummy
 
 uint8_t lookupTimerIndex(const TIM_TypeDef *tim);
+void impl_timerCaptureCompareHandler(TIM_TypeDef *tim, timHardwareContext_t * timerCtx);
+
+#endif
+
 void impl_timerInitContext(timHardwareContext_t * timCtx);
 
 volatile timCCR_t * impl_timerCCR(TCH_t * tch);
-void impl_timerCaptureCompareHandler(TIM_TypeDef *tim, timHardwareContext_t * timerCtx);
-
 void impl_timerNVICConfigure(TCH_t * tch, int irqPriority);
 void impl_timerConfigBase(TCH_t * tch, uint16_t period, uint32_t hz);
 void impl_enableTimer(TCH_t * tch);

@@ -34,8 +34,14 @@
 #include "drivers/timer.h"
 #include "drivers/timer_impl.h"
 
+#if defined(AT32F43x) // todo
+const uint16_t lookupDMASourceTable[4] = { TMR_C1_RECAPTURE_FLAG, TMR_C2_RECAPTURE_FLAG, TMR_C3_RECAPTURE_FLAG, TMR_C4_RECAPTURE_FLAG };
+const uint8_t lookupTIMChannelTable[4] = { TMR_C1_FLAG, TMR_C2_FLAG, TMR_C3_FLAG, TMR_C4_FLAG };
+#else
 const uint16_t lookupDMASourceTable[4] = { TIM_DMA_CC1, TIM_DMA_CC2, TIM_DMA_CC3, TIM_DMA_CC4 };
 const uint8_t lookupTIMChannelTable[4] = { TIM_Channel_1, TIM_Channel_2, TIM_Channel_3, TIM_Channel_4 };
+#endif
+
 
 void impl_timerInitContext(timHardwareContext_t * timCtx)
 {
@@ -59,7 +65,7 @@ void impl_timerConfigBase(TCH_t * tch, uint16_t period, uint32_t hz)
 {
     TIM_TypeDef * tim = tch->timCtx->timDef->tim;
     TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
-
+        // 
     TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
     TIM_TimeBaseStructure.TIM_Period = (period - 1) & 0xffff; // AKA TIMx_ARR
     TIM_TimeBaseStructure.TIM_Prescaler = lrintf((float)timerGetBaseClock(tch) / hz + 0.01f) - 1;
@@ -118,7 +124,8 @@ static unsigned getFilter(unsigned ticks)
 void impl_timerChConfigIC(TCH_t * tch, bool polarityRising, unsigned inputFilterTicks)
 {
     TIM_ICInitTypeDef TIM_ICInitStructure;
-
+    //tmr_input_config_type
+    
     TIM_ICStructInit(&TIM_ICInitStructure);
     TIM_ICInitStructure.TIM_Channel = lookupTIMChannelTable[tch->timHw->channelIndex];
     TIM_ICInitStructure.TIM_ICPolarity = polarityRising ? TIM_ICPolarity_Rising : TIM_ICPolarity_Falling;

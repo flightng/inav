@@ -4,11 +4,10 @@
 
 enum rcc_reg {
     RCC_EMPTY = 0,   // make sure that default value (0) does not enable anything
-
-    RCC_AHB,
-    RCC_APB2,
-    RCC_APB1,
-    RCC_AHB1,
+    RCC_AHB,        //0x20      
+    RCC_APB2,       //0x40  CRM->apb2en
+    RCC_APB1,       //0x60  CRM->apb1en end AT32 
+    RCC_AHB1,       //0x80 
     RCC_AHB2,
     RCC_APB1L,
     RCC_APB1H,
@@ -17,16 +16,17 @@ enum rcc_reg {
     RCC_AHB4,
     RCC_APB4
 };
-
+ 
 #define RCC_ENCODE(reg, mask) (((reg) << 5) | LOG2_32BIT(mask))
-
+//ahben1 AHB 外设时钟使能寄存器 1 
+//apb1en APB1 外设时钟使能寄存器
+//apb2en APB2 外设时钟使能寄存器
 #ifdef AT32F43x
-//CRM_GPIOA_PERIPH_CLOCK
-
-#define RCC_AHB(periph) RCC_ENCODE(RCC_AHB, RCC_AHBENR_ ## periph ## EN)
-#define RCC_AHB1(periph) RCC_ENCODE(RCC_AHB1, RCC_AHB1ENR_ ## periph ## EN)
-#define RCC_APB1(periph) RCC_ENCODE(RCC_APB1, RCC_APB1ENR_ ## periph ## EN)
-#define RCC_APB2(periph) RCC_ENCODE(RCC_APB2, RCC_APB2ENR_ ## periph ## EN)
+//CRM->ahben1.gpioaen   todo RCC_AHB used?
+#define RCC_AHB(periph) RCC_ENCODE(RCC_AHB, CRM->ahben1.## periph ## en) 
+#define RCC_AHB1(periph) RCC_ENCODE(RCC_AHB1, CRM->ahben1. ## periph ## en)
+#define RCC_APB1(periph) RCC_ENCODE(RCC_APB1, CRM->apb1en. ## periph ## en)
+#define RCC_APB2(periph) RCC_ENCODE(RCC_APB2, CRM->apb2en. ## periph ## en)
 #else
 #define RCC_AHB(periph) RCC_ENCODE(RCC_AHB, RCC_AHBENR_ ## periph ## EN)
 #define RCC_AHB1(periph) RCC_ENCODE(RCC_AHB1, RCC_AHB1ENR_ ## periph ## EN)

@@ -43,6 +43,7 @@ typedef uint32_t timCNT_t;
 #error "Unknown CPU defined"
 #endif
 
+// todo 
 #if defined(STM32F4)|| defined(AT32F43x)
 #define HARDWARE_TIMER_DEFINITION_COUNT 14
 #elif defined(STM32F7)
@@ -52,13 +53,47 @@ typedef uint32_t timCNT_t;
 #else
 #error "Unknown CPU defined"
 #endif
-//  tmr_type todo
+//  tmr_type todo 
+#if defined(AT32F43x)
+typedef struct timerDef_s {
+    tmr_type   * tim;
+    rccPeriphTag_t  rcc;
+    uint8_t         irq;
+    uint8_t         secondIrq;
+} timerDef_t;
+// TCH hardware definition (listed in target.c)
+typedef struct timerHardware_s {
+    tmr_type *tim;
+    ioTag_t tag;
+    uint8_t channelIndex;
+    uint8_t output;
+    ioConfig_t ioMode;
+    uint8_t alternateFunction;
+    uint32_t usageFlags;
+    dmaTag_t dmaTag;
+} timerHardware_t;
+#else
 typedef struct timerDef_s {
     TIM_TypeDef   * tim;
     rccPeriphTag_t  rcc;
     uint8_t         irq;
     uint8_t         secondIrq;
 } timerDef_t;
+
+// TCH hardware definition (listed in target.c)
+typedef struct timerHardware_s {
+    TIM_TypeDef *tim;
+    ioTag_t tag;
+    uint8_t channelIndex;
+    uint8_t output;
+    ioConfig_t ioMode;
+    uint8_t alternateFunction;
+    uint32_t usageFlags;
+    dmaTag_t dmaTag;
+} timerHardware_t;
+
+#endif
+
 
 typedef enum {
     TIM_USE_ANY             = 0,
@@ -73,17 +108,7 @@ typedef enum {
     TIM_USE_BEEPER          = (1 << 25),
 } timerUsageFlag_e;
 
-// TCH hardware definition (listed in target.c)
-typedef struct timerHardware_s {
-    TIM_TypeDef *tim;
-    ioTag_t tag;
-    uint8_t channelIndex;
-    uint8_t output;
-    ioConfig_t ioMode;
-    uint8_t alternateFunction;
-    uint32_t usageFlags;
-    dmaTag_t dmaTag;
-} timerHardware_t;
+
 
 enum {
     TIMER_OUTPUT_NONE = 0x00,
@@ -155,7 +180,14 @@ typedef enum {
     TYPE_TIMER
 } channelType_t;
 
+#if defined(AT32F43x)
+uint32_t timerClock(tmr_type *tim);
+uint16_t timerGetPrescalerByDesiredMhz(tmr_type *tim, uint16_t mhz);
+#else
 uint32_t timerClock(TIM_TypeDef *tim);
+uint16_t timerGetPrescalerByDesiredMhz(TIM_TypeDef *tim, uint16_t mhz);
+#endif
+
 uint32_t timerGetBaseClockHW(const timerHardware_t * timHw);
 
 const timerHardware_t * timerGetByUsageFlag(timerUsageFlag_e flag);
@@ -192,4 +224,4 @@ bool timerPWMDMAInProgress(TCH_t * tch);
 
 volatile timCCR_t *timerCCR(TCH_t * tch);
 
-uint16_t timerGetPrescalerByDesiredMhz(TIM_TypeDef *tim, uint16_t mhz);
+

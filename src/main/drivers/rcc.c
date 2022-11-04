@@ -9,7 +9,7 @@ void RCC_ClockCmd(rccPeriphTag_t periphTag, FunctionalState NewState)
 {
     int tag = periphTag >> 5;
     uint32_t mask = 1 << (periphTag & 0x1f);
-
+    // todo base + gpioaen 
     switch (tag) 
     {
 

@@ -181,11 +181,11 @@ typedef enum {
 } channelType_t;
 
 #if defined(AT32F43x)
-uint32_t timerClock(tmr_type *tim);
-uint16_t timerGetPrescalerByDesiredMhz(tmr_type *tim, uint16_t mhz);
+    uint32_t timerClock(tmr_type *tim);
+    uint16_t timerGetPrescalerByDesiredMhz(tmr_type *tim, uint16_t mhz);
 #else
-uint32_t timerClock(TIM_TypeDef *tim);
-uint16_t timerGetPrescalerByDesiredMhz(TIM_TypeDef *tim, uint16_t mhz);
+    uint32_t timerClock(TIM_TypeDef *tim);
+    uint16_t timerGetPrescalerByDesiredMhz(TIM_TypeDef *tim, uint16_t mhz);
 #endif
 
 uint32_t timerGetBaseClockHW(const timerHardware_t * timHw);

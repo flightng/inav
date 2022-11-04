@@ -34,14 +34,8 @@
 #include "drivers/timer.h"
 #include "drivers/timer_impl.h"
 
-#if defined(AT32F43x) // todo
-const uint16_t lookupDMASourceTable[4] = { TMR_C1_RECAPTURE_FLAG, TMR_C2_RECAPTURE_FLAG, TMR_C3_RECAPTURE_FLAG, TMR_C4_RECAPTURE_FLAG };
-const uint8_t lookupTIMChannelTable[4] = { TMR_C1_FLAG, TMR_C2_FLAG, TMR_C3_FLAG, TMR_C4_FLAG };
-#else
 const uint16_t lookupDMASourceTable[4] = { TIM_DMA_CC1, TIM_DMA_CC2, TIM_DMA_CC3, TIM_DMA_CC4 };
 const uint8_t lookupTIMChannelTable[4] = { TIM_Channel_1, TIM_Channel_2, TIM_Channel_3, TIM_Channel_4 };
-#endif
-
 
 void impl_timerInitContext(timHardwareContext_t * timCtx)
 {

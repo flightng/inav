@@ -1,6 +1,7 @@
 #pragma once
 
 #include "rcc_types.h"
+#include "rcc_at32f43x_periph.h"
 
 enum rcc_reg {
     RCC_EMPTY = 0,   // make sure that default value (0) does not enable anything
@@ -22,11 +23,19 @@ enum rcc_reg {
 //apb1en APB1 外设时钟使能寄存器
 //apb2en APB2 外设时钟使能寄存器
 #ifdef AT32F43x
-//CRM->ahben1.gpioaen   todo RCC_AHB used? ((uint32_t)0x00000001)
-#define RCC_AHB(periph) RCC_ENCODE(RCC_AHB, ((uint32_t)CRM->ahben1.## periph ## en)) 
-#define RCC_AHB1(periph) RCC_ENCODE(RCC_AHB1, ((uint32_t)CRM->ahben1. ## periph ## en))
-#define RCC_APB1(periph) RCC_ENCODE(RCC_APB1, ((uint32_t)CRM->apb1en. ## periph ## en))
-#define RCC_APB2(periph) RCC_ENCODE(RCC_APB2, ((uint32_t)CRM->apb2en. ## periph ## en))
+//CRM->ahben1.gpioaen   todo RCC_AHB used? ((uint32_t)0x00000001) 
+// #define RCC_AHB(periph) RCC_ENCODE(RCC_AHB, ((uint32_t)CRM->ahben1.## periph ## en)) 
+// #define RCC_AHB1(periph) RCC_ENCODE(RCC_AHB1, ((uint32_t)CRM->ahben1. ## periph ## en))
+// #define RCC_APB1(periph) RCC_ENCODE(RCC_APB1, ((uint32_t)CRM->apb1en. ## periph ## en))
+// #define RCC_APB2(periph) RCC_ENCODE(RCC_APB2, ((uint32_t)CRM->apb2en. ## periph ## en))
+
+#define RCC_AHB1(periph) RCC_ENCODE(RCC_AHB1,   CRM_AHB1_ ## periph ## _PER_MASK)
+#define RCC_AHB2(periph) RCC_ENCODE(RCC_AHB2,   CRM_AHB2_ ## periph ## _PER_MASK)
+#define RCC_AHB3(periph) RCC_ENCODE(RCC_AHB3,   CRM_AHB3_ ## periph ## _PER_MASK)
+#define RCC_APB1(periph) RCC_ENCODE(RCC_APB1, 	CRM_APB1_ ## periph ## _PER_MASK)
+#define RCC_APB2(periph) RCC_ENCODE(RCC_APB2, 	CRM_APB2_ ## periph ## _PER_MASK)
+
+
 #else
 #define RCC_AHB(periph) RCC_ENCODE(RCC_AHB, RCC_AHBENR_ ## periph ## EN)
 #define RCC_AHB1(periph) RCC_ENCODE(RCC_AHB1, RCC_AHB1ENR_ ## periph ## EN)

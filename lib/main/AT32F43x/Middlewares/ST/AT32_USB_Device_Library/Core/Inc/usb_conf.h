@@ -34,7 +34,6 @@ extern "C" {
 
 #include "at32f435_437_usb.h"
 #include "at32f435_437.h"
-#include "at32f435_437_board.h"
 
 /** @addtogroup AT32F437_periph_examples
   * @{

@@ -93,7 +93,7 @@ DEFINE_EDMA_IRQ_HANDLER(0, 6, 22)
 DEFINE_EDMA_IRQ_HANDLER(0, 7, 23)
 DEFINE_EDMA_IRQ_HANDLER(0, 8, 24) 
 */
-
+// 这里使用DMA 和通道号匹配 DEF_TIM_DMAMAP
 DMA_t dmaGetByTag(dmaTag_t tag)
 {
     for (unsigned i = 0; i < ARRAYLEN(dmaDescriptors); i++) {
@@ -134,15 +134,14 @@ void dmaSetHandler(DMA_t dma, dmaCallbackHandlerFuncPtr callback, uint32_t prior
 
     dma->irqHandlerCallback = callback;
     dma->userParam = userParam;
-
-    NVIC_SetPriority(dma->irqNumber, priority);
-    NVIC_EnableIRQ(dma->irqNumber);
+	nvic_irq_enable(dma->irqNumber, priority,0);  
+    
 }
-
+// todo unused
 uint32_t dmaGetChannelByTag(dmaTag_t tag)
 {
     // todo QA  DEFINE_DMA_CHANNEL 0 get index?  return DMA_Channel_0? 
-    // DMA1_Channel1
+    // DMA1_Channel1 
     static const uint32_t dmaChannel[8] = { DMA_Channel_0, DMA_Channel_1, DMA_Channel_2, DMA_Channel_3, DMA_Channel_4, DMA_Channel_5, DMA_Channel_6, DMA_Channel_7 };
     return dmaChannel[DMATAG_GET_CHANNEL(tag)];
 }

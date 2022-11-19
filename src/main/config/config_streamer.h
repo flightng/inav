@@ -32,7 +32,7 @@ typedef uint32_t config_streamer_buffer_align_type_t;
 #define CONFIG_STREAMER_BUFFER_SIZE 32  // Flash word = 256-bits
 typedef uint64_t config_streamer_buffer_align_type_t;
 #else
-#define CONFIG_STREAMER_BUFFER_SIZE 4
+#define CONFIG_STREAMER_BUFFER_SIZE 4    // at32 used 32-bits
 typedef uint32_t config_streamer_buffer_align_type_t;
 #endif
 

@@ -88,7 +88,10 @@
     #if defined(TMR14)
         [13] = { .tim = TMR14, .rcc = RCC_APB1(TMR14), .irq = TMR8_TRG_HALL_TMR14_IRQn},
     #endif
-    // todo TMR20 unused
+    // todo TMR20
+    #if defined(TMR20)
+         [14] = { .tim = TMR20, .rcc = RCC_APB2(TMR20), .irq = TMR20_CH_IRQn},
+     #endif
     }; 
 
 uint32_t timerClock(tmr_type *tim)
@@ -111,3 +114,4 @@ _TIM_IRQ_HANDLER(TMR8_CH_IRQHandler, 8);
 _TIM_IRQ_HANDLER2(TMR8_BRK_TMR12_IRQHandler, 8, 12);
 _TIM_IRQ_HANDLER2(TMR8_OVF_TMR13_IRQHandler, 8, 13);
 _TIM_IRQ_HANDLER2(TMR8_TRG_HALL_TMR14_IRQHandler, 8, 14);
+_TIM_IRQ_HANDLER(TMR20_CH_IRQHandler, 20);

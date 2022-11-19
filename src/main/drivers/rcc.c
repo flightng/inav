@@ -49,7 +49,7 @@ void RCC_ClockCmd(rccPeriphTag_t periphTag, FunctionalState NewState)
                 break;
         #endif
 
-        #if defined(AT32F4) 
+        #if defined(AT32F43x) 
             case RCC_AHB1:
                 RCC_BIT_CMD(CRM->ahben1, mask, NewState);
                 break;
@@ -124,7 +124,7 @@ void RCC_ResetCmd(rccPeriphTag_t periphTag, FunctionalState NewState)
                 break;
         #endif
         // //ahbrst1 apb1rst 
-        #if defined(AT32F4) 
+        #if defined(AT32F43x) 
             case RCC_AHB1:
                 RCC_BIT_CMD(CRM->ahbrst1, mask, NewState);
                 break; 

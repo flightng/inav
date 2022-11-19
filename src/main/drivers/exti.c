@@ -125,6 +125,7 @@ void EXTIConfig(IO_t io, extiCallbackRec_t *cb, int irqPriority, exint_polarity_
     exint_flag_clear(extiLine);
      //todo 
     exint_init_type EXTIInit;
+    exint_default_para_init(&EXTIInit);
     EXTIInit.line_mode = EXINT_LINE_INTERRUPUT;
     EXTIInit.line_select = extiLine; 
     EXTIInit.line_polarity = trigger;
@@ -133,9 +134,8 @@ void EXTIConfig(IO_t io, extiCallbackRec_t *cb, int irqPriority, exint_polarity_
      
     if (extiGroupPriority[group] > irqPriority) {
         extiGroupPriority[group] = irqPriority;
-
-        NVIC_SetPriority(extiGroupIRQn[group], irqPriority);
-        NVIC_EnableIRQ(extiGroupIRQn[group]);
+  	    nvic_priority_group_config(NVIC_PRIORITY_GROUPING);
+  	    nvic_irq_enable(extiGroupIRQn[group],irqPriority,0);  
     }
 }
 #else

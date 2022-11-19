@@ -60,7 +60,7 @@ const struct ioPortDef_s ioPortDefs[] = {
     { RCC_AHB4(GPIOH) },
     { RCC_AHB4(GPIOI) },
 };
-#elif defined(AT32F43x)  //TODO 
+#elif defined(AT32F43x)   
 const struct ioPortDef_s ioPortDefs[] = {
     { RCC_AHB1(GPIOA) },
     { RCC_AHB1(GPIOB) },
@@ -82,7 +82,7 @@ ioRec_t* IO_Rec(IO_t io)
     return io;
 }
 
-#if defined(AT32F43x)  //TODO  
+#if defined(AT32F43x)   
 gpio_type * IO_GPIO(IO_t io)
 {
     const ioRec_t *ioRec = IO_Rec(io);
@@ -391,7 +391,7 @@ void IOConfigGPIOAF(IO_t io, ioConfig_t cfg, uint8_t af)
     }
     const rccPeriphTag_t rcc = ioPortDefs[IO_GPIOPortIdx(io)].rcc;
     RCC_ClockCmd(rcc, ENABLE);
-    // todo 
+    // todo  gpio af mux
     gpio_pin_mux_config(IO_GPIO(io), IO_GPIO_PinSource(io), af);
 
     gpio_init_type init = {

@@ -3280,7 +3280,7 @@ static void cliStatus(char *cmdline)
     cliPrintLinef("Current Time: %s", buf);
     cliPrintLinef("Voltage: %d.%02dV (%dS battery - %s)", getBatteryVoltage() / 100, getBatteryVoltage() % 100, getBatteryCellCount(), getBatteryStateString());
     cliPrintf("CPU Clock=%dMHz", (SystemCoreClock / 1000000));
-
+  
     const uint32_t detectedSensorsMask = sensorsMask();
 
     for (int i = 0; i < SENSOR_INDEX_COUNT; i++) {
@@ -3295,20 +3295,31 @@ static void cliStatus(char *cmdline)
         }
     }
     cliPrintLinefeed();
+#if defined(AT32F43x)
+        cliPrintLine("AT32 system clocks:");
+        crm_clocks_freq_type clocks;
+        crm_clocks_freq_get(&clocks); 
+       
+        cliPrintLinef("  SYSCLK = %d MHz", clocks.sclk_freq / 1000000);
+        cliPrintLinef("  ABH    = %d MHz", clocks.ahb_freq  / 1000000);
+        cliPrintLinef("  ABP1   = %d MHz", clocks.apb1_freq / 1000000);
+        cliPrintLinef("  ABP2   = %d MHz", clocks.apb2_freq / 1000000);
 
-    cliPrintLine("STM32 system clocks:");
-#if defined(USE_HAL_DRIVER)
-    cliPrintLinef("  SYSCLK = %d MHz", HAL_RCC_GetSysClockFreq() / 1000000);
-    cliPrintLinef("  HCLK   = %d MHz", HAL_RCC_GetHCLKFreq() / 1000000);
-    cliPrintLinef("  PCLK1  = %d MHz", HAL_RCC_GetPCLK1Freq() / 1000000);
-    cliPrintLinef("  PCLK2  = %d MHz", HAL_RCC_GetPCLK2Freq() / 1000000);
 #else
-    RCC_ClocksTypeDef clocks;
-    RCC_GetClocksFreq(&clocks);
-    cliPrintLinef("  SYSCLK = %d MHz", clocks.SYSCLK_Frequency / 1000000);
-    cliPrintLinef("  HCLK   = %d MHz", clocks.HCLK_Frequency / 1000000);
-    cliPrintLinef("  PCLK1  = %d MHz", clocks.PCLK1_Frequency / 1000000);
-    cliPrintLinef("  PCLK2  = %d MHz", clocks.PCLK2_Frequency / 1000000);
+        cliPrintLine("STM32 system clocks:");
+    #if defined(USE_HAL_DRIVER)
+        cliPrintLinef("  SYSCLK = %d MHz", HAL_RCC_GetSysClockFreq() / 1000000);
+        cliPrintLinef("  HCLK   = %d MHz", HAL_RCC_GetHCLKFreq() / 1000000);
+        cliPrintLinef("  PCLK1  = %d MHz", HAL_RCC_GetPCLK1Freq() / 1000000);
+        cliPrintLinef("  PCLK2  = %d MHz", HAL_RCC_GetPCLK2Freq() / 1000000);
+    #else
+        RCC_ClocksTypeDef clocks;
+        RCC_GetClocksFreq(&clocks);
+        cliPrintLinef("  SYSCLK = %d MHz", clocks.SYSCLK_Frequency / 1000000);
+        cliPrintLinef("  HCLK   = %d MHz", clocks.HCLK_Frequency / 1000000);
+        cliPrintLinef("  PCLK1  = %d MHz", clocks.PCLK1_Frequency / 1000000);
+        cliPrintLinef("  PCLK2  = %d MHz", clocks.PCLK2_Frequency / 1000000);
+    #endif
 #endif
 
     cliPrintLinef("Sensor status: GYRO=%s, ACC=%s, MAG=%s, BARO=%s, RANGEFINDER=%s, OPFLOW=%s, GPS=%s",

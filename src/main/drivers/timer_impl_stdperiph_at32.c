@@ -44,17 +44,15 @@ void impl_timerInitContext(timHardwareContext_t * timCtx)
 {
     (void)timCtx;   // NoOp
 }
-// 中断优先级 todo
+// 中断优先级 
 void impl_timerNVICConfigure(TCH_t * tch, int irqPriority)
 {
     if (tch->timCtx->timDef->irq) {
-        NVIC_SetPriority(tch->timCtx->timDef->irq, irqPriority);
-        NVIC_EnableIRQ(tch->timCtx->timDef->irq);
+        nvic_irq_enable(tch->timCtx->timDef->irq, irqPriority, 0);
     }
 
     if (tch->timCtx->timDef->secondIrq) {
-        NVIC_SetPriority(tch->timCtx->timDef->secondIrq, irqPriority);
-        NVIC_EnableIRQ(tch->timCtx->timDef->secondIrq);
+        nvic_irq_enable(tch->timCtx->timDef->secondIrq, irqPriority, 0);
     }
 }
 

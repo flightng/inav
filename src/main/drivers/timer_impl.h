@@ -23,7 +23,7 @@
 #elif defined(AT32F43x) // todo
 #  define IMPL_TIM_IT_UPDATE_INTERRUPT      TMR_OVF_INT
 #  define TIM_IT_CCx(chIdx)                 (TMR_C1_INT << (chIdx))
-
+// 0x2 0x4 0x8 0x10 0\1\2\3
 
 #define _TIM_IRQ_HANDLER2(name, i, j)                                   \
     void name(void)                                                     \

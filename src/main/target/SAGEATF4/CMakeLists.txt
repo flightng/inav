@@ -1,1 +1,1 @@
-target_at32f4xx(SAGEATF4)
+target_at32f43x_xMT7(SAGEATF4)

@@ -44,12 +44,14 @@ typedef uint32_t timCNT_t;
 #endif
 
 // todo 
-#if defined(STM32F4)|| defined(AT32F43x)
+#if defined(STM32F4)
 #define HARDWARE_TIMER_DEFINITION_COUNT 14
 #elif defined(STM32F7)
 #define HARDWARE_TIMER_DEFINITION_COUNT 14
 #elif defined(STM32H7)
 #define HARDWARE_TIMER_DEFINITION_COUNT 14
+#elif defined(AT32F43x)
+#define HARDWARE_TIMER_DEFINITION_COUNT 15
 #else
 #error "Unknown CPU defined"
 #endif

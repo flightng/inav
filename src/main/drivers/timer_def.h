@@ -18,8 +18,9 @@
 #pragma once
 
 #include "drivers/dma.h"
-// todo need redo
+// todo 没看懂TMR和DMA的对应  DEF_TIM DEF_TIM_DMAMAP__D 
 // Macros expand to keep DMA descriptor table compatible with Betaflight
+//BTCH_TMR1_CH1N  
 #define DEF_TIM_DMAMAP(variant, timch) CONCAT(DEF_TIM_DMAMAP__, PP_CALL(CONCAT(DEF_TIM_DMAMAP_VARIANT__, variant), CONCAT(DEF_TIM_DMA__, DEF_TIM_TCH2BTCH(timch)), DMA_VARIANT_MISSING, DMA_VARIANT_MISSING))
 #define DEF_TIM_DMAMAP_VARIANT__0(_0, ...)                                                                      _0
 #define DEF_TIM_DMAMAP_VARIANT__1(_0, _1, ...)                                                                  _1
@@ -49,6 +50,7 @@
 #define DEF_TIM_CHNL_CH4N   3
 
 // map to base channel (strip N from channel); works only when channel N exists
+//BTCH_TMR1_CH1N
 #define DEF_TIM_TCH2BTCH(timch) CONCAT(BTCH_, timch)
 
 #if defined(AT32F43x)

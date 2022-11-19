@@ -27,7 +27,7 @@ typedef struct dmaChannelDescriptor_s * DMA_t;
 #if defined(UNIT_TEST)
 typedef uint32_t DMA_TypeDef;
 #endif
-
+// 高4位DMA，中4位 stream，低8位channel
 #define DMA_TAG(dma, stream, channel)   ( (((dma) & 0x03) << 12) | (((stream) & 0x0F) << 8) | (((channel) & 0xFF) << 0) )
 #define DMA_NONE                        (0)
 

@@ -179,7 +179,7 @@ uint16_t timerGetPeriod(TCH_t * tch)
         return tch->timHw->tim->ARR;
     #endif
 }
-
+//timerHardware  target.c
 void timerInit(void)
 {
     memset(timerCtx, 0, sizeof (timerCtx));

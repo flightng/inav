@@ -86,17 +86,17 @@
 
 // *************** I2C/Baro/Mag/EXT*********************
 #define USE_I2C
-#define USE_I2C_DEVICE_1
-#define I2C1_SCL                PC0        // SCL pad
-#define I2C1_SDA                PC1        // SDA pad
+#define USE_I2C_DEVICE_3
+#define I2C3_SCL                PC0        // SCL pad
+#define I2C3_SDA                PC1        // SDA pad
 #define USE_I2C_PULLUP
 
 #define USE_BARO
-#define BARO_I2C_BUS            BUS_I2C1
+#define BARO_I2C_BUS            BUS_I2C3
 #define USE_BARO_BMP280
 
 #define USE_MAG
-#define MAG_I2C_BUS             BUS_I2C1
+#define MAG_I2C_BUS             BUS_I2C3
 #define USE_MAG_HMC5883
 #define USE_MAG_QMC5883
  
@@ -168,7 +168,7 @@
 #define USE_ADC
 #define ADC_INSTANCE                ADC1
 // todo
-#define ADC1_DMA_STREAM             DMA2_Stream5
+#define ADC1_DMA_STREAM             DMA2_CHANNEL5
 #define ADC_CHANNEL_1_PIN           PB0
 #define ADC_CHANNEL_2_PIN           PB1
 //#define ADC_CHANNEL_3_PIN           PB0

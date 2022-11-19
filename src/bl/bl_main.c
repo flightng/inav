@@ -33,7 +33,9 @@
 #include "drivers/persistent.h"
 #include "drivers/io.h"
 #include "drivers/light_led.h"
+
 #include "drivers/sdcard/sdcard.h"
+
 #include "drivers/system.h"
 #include "drivers/time.h"
 
@@ -67,8 +69,17 @@ flashSectorDef_t flashSectors[] = { { 32, 4 }, { 128, 1 }, { 256, 3 }, { 0, 0 } 
 #elif defined(STM32F765xI)
 #define SECTOR_COUNT 8
 flashSectorDef_t flashSectors[] = { { 32, 4 }, { 128, 1 }, { 256, 7 }, { 0, 0 } };
+ 
+#elif defined(AT32F437ZMT7) || defined(AT32F437VMT7) || defined(AT32F435RMT7)
+#define SECTOR_COUNT 1007
+flashSectorDef_t flashSectors[] = { { 4, 1007 }, { 0, 0 } };
+
+#elif defined(AT32F437ZGT7) ||defined(AT32F437VGT7) || defined(AT32F435RGT7)
+#define SECTOR_COUNT 511
+flashSectorDef_t flashSectors[] = { { 2, 511 }, { 0, 0 } };
 
 #else
+
 #error Unsupported MCU
 #endif
 
@@ -78,6 +89,9 @@ flashSectorDef_t flashSectors[] = { { 32, 4 }, { 128, 1 }, { 256, 7 }, { 0, 0 } 
 #elif defined(STM32F7)
     #define flashLock() HAL_FLASH_Lock()
     #define flashUnlock() HAL_FLASH_Unlock()
+#elif defined(AT32F43x)
+#define flashLock() flash_lock()
+#define flashUnlock() flash_unlock()
 #endif
 
 static bool dataBackEndInitialized = false;
@@ -169,24 +183,60 @@ static void do_jump(uint32_t address)
     __set_MSP(bootloaderVector->stackEnd);
     bootloaderVector->resetHandler();
 }
-
+ 
 void bootloader_jump_to_app(void)
 {
-    FLASH->ACR &= (~FLASH_ACR_PRFTEN);
+    #if defined(AT32F43x)
+        //todo 
+        /*Close Peripherals Clock*/
+        CRM->apb2rst = 0xFFFF;
+        CRM->apb2rst = 0;
+        CRM->apb1rst = 0xFFFF;
+        CRM->apb1rst = 0;
+        CRM->apb1en = 0;
+        CRM->apb2en = 0;
+        /*Close PLL*/
+        /* Reset SW, AHBDIV, APB1DIV, APB2DIV, ADCDIV and CLKOUT_SEL bits */
+        CRM->cfg_bit.sclksel = 0;
+        CRM->cfg_bit.ahbdiv = 0;
+        CRM->cfg_bit.apb1div = 0;
+        CRM->cfg_bit.apb2div = 0;
+        CRM->cfg_bit.adcdiv_l = 0;
+        CRM->cfg_bit.adcdiv_h = 0;
+        CRM->cfg_bit.clkout_sel = 0;
+        CRM->ctrl_bit.hexten = 0;
+        CRM->ctrl_bit.cfden = 0;
+        CRM->ctrl_bit.pllen = 0;
+        CRM->cfg_bit.pllrcs = 0;
+        CRM->cfg_bit.pllhextdiv = 0;
+        CRM->cfg_bit.pllmult_l = 0;
+        CRM->cfg_bit.pllmult_h = 0;
+        CRM->cfg_bit.usbdiv_l = 0;
+        CRM->cfg_bit.usbdiv_h = 0;
+        CRM->cfg_bit.pllrange = 0;
+        /* Disable all interrupts and clear pending bits */
+        CRM->clkint_bit.lickstblfc = 0;
+        CRM->clkint_bit.lextstblfc = 0;
+        CRM->clkint_bit.hickstblfc = 0;
+        CRM->clkint_bit.hextstblfc = 0;
+        CRM->clkint_bit.pllstblfc = 0;
+        CRM->clkint_bit.cfdfc = 0;
+        /*Colse Systick*/
+        SysTick->CTRL = 0;
 
-#if defined(STM32F4)
-    RCC_APB1PeriphResetCmd(~0, DISABLE);
-    RCC_APB2PeriphResetCmd(~0, DISABLE);
+    #else
+        FLASH->ACR &= (~FLASH_ACR_PRFTEN);
 
-    //void crm_ahb_div_set(crm_ahb_div_type value);
-//void crm_apb1_div_set(crm_apb1_div_type value);
-//void crm_apb2_div_set(crm_apb2_div_type value);
-#elif defined(STM32F7)
-    RCC->APB1ENR = 0;
-    RCC->APB1LPENR = 0;
-    RCC->APB2ENR = 0;
-    RCC->APB2LPENR = 0;
-#endif
+        #if defined(STM32F4)
+            RCC_APB1PeriphResetCmd(~0, DISABLE);
+            RCC_APB2PeriphResetCmd(~0, DISABLE);
+        #elif defined(STM32F7)
+            RCC->APB1ENR = 0;
+            RCC->APB1LPENR = 0;
+            RCC->APB2ENR = 0;
+            RCC->APB2LPENR = 0;
+        #endif
+    #endif
 
     __disable_irq();
 
@@ -197,12 +247,14 @@ void bootloader_jump_to_app(void)
 // returns -1 if not found
 int8_t mcuFlashAddressSectorIndex(uint32_t address)
 {
+    // at32 0x08000000UL
     uint32_t sectorStartAddress = FLASH_START_ADDRESS;
     uint8_t sector = 0;
     flashSectorDef_t *sectorDef = flashSectors;
 
     do {
         for (unsigned j = 0; j < sectorDef->count; ++j) {
+            // 获取地址所在的扇区 起始地址+扇区*（4/2）K
             uint32_t sectorEndAddress = sectorStartAddress + sectorDef->size * 1024;
             /*if ((CONFIG_START_ADDRESS >= sectorStartAddress) && (CONFIG_START_ADDRESS < sectorEndAddress) && (CONFIG_END_ADDRESS <= sectorEndAddress)) {*/
             if ((address >= sectorStartAddress) && (address < sectorEndAddress)) {
@@ -227,6 +279,17 @@ uint32_t mcuFlashSectorID(uint8_t sectorIndex)
     }
 #elif defined(STM32F7)
     return sectorIndex;
+#elif defined(AT32F437ZMT7) || defined(AT32F437VMT7) || defined(AT32F435RMT7)
+    if (sectorIndex < 512)
+    {
+         return FLASH_START_ADDRESS + sectorIndex * 4 * 1024;
+    }
+    else
+    {
+         return FLASH_START_ADDRESS + 0x200000 + (sectorIndex-512) * 4 * 1024;
+    }
+ #elif defined(AT32F437ZGT7) ||defined(AT32F437VGT7) || defined(AT32F435RGT7)
+     return FLASH_START_ADDRESS + sectorIndex * 2 * 1024;
 #endif
 }
 
@@ -244,11 +307,14 @@ bool mcuFlashSectorErase(uint8_t sectorIndex)
     uint32_t SECTORError;
     const HAL_StatusTypeDef status = HAL_FLASHEx_Erase(&EraseInitStruct, &SECTORError);
     return (status == HAL_OK);
+#elif defined(AT32F43x)
+    return (flash_sector_erase(mcuFlashSectorID(sectorIndex)) == FLASH_OPERATE_DONE);
 #else
+
 #error Unsupported MCU
 #endif
 }
-
+// 擦除扇区
 bool mcuFirmwareFlashErase(bool includeConfig)
 {
     int8_t firmwareSectorIndex = mcuFlashAddressSectorIndex(FIRMWARE_START_ADDRESS);
@@ -273,7 +339,7 @@ bool mcuFirmwareFlashErase(bool includeConfig)
     LED1_OFF;
     return true;
 }
-
+// 写入扇区
 bool mcuFlashWriteWord(uint32_t address, uint32_t data)
 {
 #if defined(STM32F4)
@@ -282,6 +348,10 @@ bool mcuFlashWriteWord(uint32_t address, uint32_t data)
 #elif defined(STM32F7)
     const HAL_StatusTypeDef status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, address, (uint64_t)data);
     return (status == HAL_OK);
+#elif defined(AT32F43x)
+    flash_status_type status = FLASH_OPERATE_DONE;
+    status = flash_word_program(address, data);
+    return (status == FLASH_OPERATE_DONE);
 #else
 #error Unsupported MCU
 #endif
@@ -306,7 +376,7 @@ bool afatfs_fseekWorkAround(afatfsFilePtr_t file, uint32_t forward)
     return true;
 }
 #endif
-
+// 刷新固件
 bool flash(flashOperation_e flashOperation)
 {
     if (!dataBackendInit()) {
@@ -354,7 +424,7 @@ bool flash(flashOperation_e flashOperation)
     if (afatfs_fseekSync(flashDataFile, sizeof(buffer), AFATFS_SEEK_SET) == AFATFS_OPERATION_FAILURE) {
         goto flashFailed;
     }
-
+    // 刷入固件    
     while (!afatfs_feof(flashDataFile)) {
 
         if ((flashOperation == FLASH_OPERATION_UPDATE) && (flashDstAddress == CONFIG_START_ADDRESS)) {
@@ -368,7 +438,7 @@ bool flash(flashOperation_e flashOperation)
         }
 
         afatfs_freadSync(flashDataFile, (uint8_t *)&buffer, sizeof(buffer));
-
+        // 读取SD卡文件写入内部存储器    
         if (!mcuFlashWriteWord(flashDstAddress, buffer)) {
             goto flashFailed;
         }
@@ -441,6 +511,7 @@ flashFailed:
 }
 
 #if defined(USE_FLASHFS)
+// 格式化存储
 bool dataflashChipEraseUpdatePartition(void)
 {
     flashPartition_t *flashDataPartition = flashPartitionFindByType(FLASH_PARTITION_TYPE_UPDATE_FIRMWARE);
@@ -465,7 +536,7 @@ bool dataflashChipEraseUpdatePartition(void)
     return true;
 }
 #endif
-
+// 从SD或者FLASH刷新系统 
 int main(void)
 {
     init();

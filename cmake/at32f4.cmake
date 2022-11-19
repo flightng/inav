@@ -1,156 +1,92 @@
 include(cortex-m4f)
+include(at32-stdperiph)
+include(at32f4-usb)
 
-set(STM32F4_STDPERIPH_DIR "${MAIN_LIB_DIR}/main/AT32F43x/Drivers/AT32F4xx_StdPeriph_Driver")
-set(STM32F4_CMSIS_DEVICE_DIR "${MAIN_LIB_DIR}/main/AT32F43x/Drivers/CMSIS/Device/ST/AT32F4xx")
-set(STM32F4_CMSIS_DRIVERS_DIR "${MAIN_LIB_DIR}/main/AT32F43x/Drivers/CMSIS")
-# set(STM32F4_VCP_DIR "${MAIN_SRC_DIR}/vcpf4")
-# todo 
-set(STM32F4_STDPERIPH_SRC_EXCLUDES
-    stm32f4xx_can.c
-    stm32f4xx_cec.c
-    stm32f4xx_crc.c
-    stm32f4xx_cryp.c
-    stm32f4xx_cryp_aes.c
-    stm32f4xx_cryp_des.c
-    stm32f4xx_cryp_tdes.c
-    stm32f4xx_dbgmcu.c
-    stm32f4xx_dsi.c
-    stm32f4xx_flash_ramfunc.c
-    stm32f4xx_fmpi2c.c
-    stm32f4xx_fmc.c
-    stm32f4xx_hash.c
-    stm32f4xx_hash_md5.c
-    stm32f4xx_hash_sha1.c
-    stm32f4xx_lptim.c
-    stm32f4xx_qspi.c
-    stm32f4xx_sai.c
-    stm32f4xx_spdifrx.c
+set(AT32F4_STDPERIPH_DIR "${MAIN_LIB_DIR}/main/AT32F43x/Drivers/AT32F4xx_StdPeriph_Driver")
+set(AT32F4_CMSIS_DEVICE_DIR  "${MAIN_LIB_DIR}/main/AT32F43x/Drivers/CMSIS/Device/AT32F4xx")
+set(AT32F4_CMSIS_DRIVERS_DIR "${MAIN_LIB_DIR}/main/AT32F43x/Drivers/CMSIS")
+  
+# TODO  
+set(AT32F4_STDPERIPH_SRC_EXCLUDES
+        at32f435_437_can.c
+        at32f435_437_dvp.c
+        at32f435_437_emac
+        at32f435_437_xmc.c
 )
 
-set(STM32F4_STDPERIPH_SRC_DIR "${STM32F4_STDPERIPH_DIR}/src")
-glob_except(STM32F4_STDPERIPH_SRC "${STM32F4_STDPERIPH_SRC_DIR}/*.c" "${STM32F4_STDPERIPH_SRC_EXCLUDES}")
+set(AT32F4_STDPERIPH_SRC_DIR "${AT32F4_STDPERIPH_DIR}/src")
+glob_except(AT32F4_STDPERIPH_SRC "${AT32F4_STDPERIPH_SRC_DIR}/*.c" "${AT32F4_STDPERIPH_SRC_EXCLUDES}")
 
-main_sources(STM32F4_SRC
-    target/system_stm32f4xx.c
 
-    config/config_streamer_stm32f4.c
+main_sources(AT32F4_SRC
+    target/system_at32f435_437.c
+
+    config/config_streamer_at32f43x.c
     config/config_streamer_ram.c
     config/config_streamer_extflash.c
 
-    drivers/adc_stm32f4xx.c
-    drivers/adc_stm32f4xx.c
-    drivers/bus_i2c_stm32f40x.c
-    drivers/serial_uart_stm32f4xx.c
-    drivers/system_stm32f4xx.c
+    drivers/adc_at32f43x.c
+    drivers/bus_i2c_at32f43x.c
+    drivers/bus_spi_at32f43x
+    drivers/serial_uart_hal_at32f43x.c
+    drivers/serial_uart_at32f43x.c
+    drivers/system_at32f43x.c
     drivers/timer.c
-    drivers/timer_impl_stdperiph.c
-    drivers/timer_stm32f4xx.c
+    drivers/timer_impl_stdperiph_at32.c
+    drivers/timer_at32f43x.c
     drivers/uart_inverter.c
-    drivers/dma_stm32f4xx.c
-    drivers/sdcard/sdmmc_sdio_f4xx.c
+    drivers/dma_at32f43x.c
 )
-
-set(STM32F4_VCP_SRC
-    stm32f4xx_it.c
-    usb_bsp.c
-    usbd_desc.c
-    usbd_usr.c
-    usbd_cdc_vcp.c
-)
-list(TRANSFORM STM32F4_VCP_SRC PREPEND "${STM32F4_VCP_DIR}/")
-
-main_sources(STM32F4_MSC_SRC
-    drivers/usb_msc_f4xx.c
-)
-
-set(STM32F4_INCLUDE_DIRS
+ 
+set(AT32F4_INCLUDE_DIRS
     "${CMSIS_INCLUDE_DIR}"
     "${CMSIS_DSP_INCLUDE_DIR}"
-    "${STM32F4_STDPERIPH_DIR}/inc"
-    "${STM32F4_CMSIS_DEVICE_DIR}"
-    "${STM32F4_CMSIS_DRIVERS_DIR}"
-    "${STM32F4_VCP_DIR}"
+    "${AT32F4_STDPERIPH_DIR}/inc"
+    "${AT32F4_CMSIS_DEVICE_DIR}"
+    "${AT32F4_CMSIS_DRIVERS_DIR}"
 )
 
-set(STM32F4_DEFINITIONS
+set(AT32F4_DEFINITIONS
     ${CORTEX_M4F_DEFINITIONS}
-    STM32F4
     USE_STDPERIPH_DRIVER
 )
 
-function(target_at32f4xx)
-    target_stm32(
-        SOURCES ${STM32_STDPERIPH_SRC} ${STM32F4_SRC}
-        COMPILE_DEFINITIONS ${STM32F4_DEFINITIONS}
+function(target_at32f43x)
+    target_at32(
+        SOURCES ${AT32_STDPERIPH_SRC} ${AT32F4_SRC}
+        COMPILE_DEFINITIONS ${AT32F4_DEFINITIONS}
         COMPILE_OPTIONS ${CORTEX_M4F_COMMON_OPTIONS} ${CORTEX_M4F_COMPILE_OPTIONS}
-        INCLUDE_DIRECTORIES ${STM32F4_INCLUDE_DIRS}
+        INCLUDE_DIRECTORIES ${AT32F4_INCLUDE_DIRS}
         LINK_OPTIONS ${CORTEX_M4F_COMMON_OPTIONS} ${CORTEX_M4F_LINK_OPTIONS}
 
-        MSC_SOURCES ${STM32F4_USBMSC_SRC} ${STM32F4_MSC_SRC}
-        VCP_SOURCES ${STM32F4_USB_SRC} ${STM32F4_VCP_SRC}
-        VCP_INCLUDE_DIRECTORIES ${STM32F4_USB_INCLUDE_DIRS}
+        MSC_SOURCES ${AT32F4_USBMSC_SRC} ${AT32F4_MSC_SRC}
+        VCP_SOURCES ${AT32F4_USB_SRC} ${AT32F4_VCP_SRC}
+        VCP_INCLUDE_DIRECTORIES ${AT32F4_USB_INCLUDE_DIRS}
 
         OPTIMIZATION -O2
 
-        OPENOCD_TARGET stm32f4x
+        OPENOCD_TARGET at32f43x
 
         ${ARGN}
     )
 endfunction()
 
-set(STM32F405_COMPILE_DEFINITIONS
-    STM32F40_41xxx
-    STM32F405xx
-    MCU_FLASH_SIZE=1024
+#target_at32f43x_xMT7
+#target_at32f43x_xGT7
+
+set(at32f43x_xMT7_COMPILE_DEFINITIONS
+    AT32F437VMT7
+    MCU_FLASH_SIZE=4096
 )
 
-function(target_stm32f405xg name)
-    target_stm32f4xx(
+function(target_at32f43x_xMT7 name)
+    target_at32f43x(
         NAME ${name}
-        STARTUP startup_stm32f40xx.s
-        SOURCES ${STM32F4_STDPERIPH_SRC}
-        COMPILE_DEFINITIONS ${STM32F405_COMPILE_DEFINITIONS}
-        LINKER_SCRIPT stm32_flash_f405xg
-        SVD STM32F405
-        BOOTLOADER
-        ${ARGN}
-    )
-endfunction()
-
-set(STM32F411_OR_F427_STDPERIPH_SRC ${STM32F4_STDPERIPH_SRC})
-set(STM32F411_OR_F427_STDPERIPH_SRC_EXCLUDES "stm32f4xx_fsmc.c")
-exclude_basenames(STM32F411_OR_F427_STDPERIPH_SRC ${STM32F411_OR_F427_STDPERIPH_SRC_EXCLUDES})
-
-set(STM32F411_COMPILE_DEFINITIONS
-    STM32F411xE
-    MCU_FLASH_SIZE=512
-    OPTIMIZATION -Os
-)
-
-function(target_stm32f411xe name)
-    target_stm32f4xx(
-        NAME ${name}
-        STARTUP startup_stm32f411xe.s
-        SOURCES ${STM32F411_OR_F427_STDPERIPH_SRC}
-        COMPILE_DEFINITIONS ${STM32F411_COMPILE_DEFINITIONS}
-	LINKER_SCRIPT stm32_flash_f411xe
-        SVD STM32F411
-	${ARGN}
-    )
-endfunction()
-
-set(STM32F427_COMPILE_DEFINITIONS
-    STM32F427_437xx
-    MCU_FLASH_SIZE=1024
-)
-function(target_stm32f427xg name)
-    target_stm32f4xx(
-        NAME ${name}
-        STARTUP startup_stm32f427xx.s
-        SOURCES ${STM32F411_OR_F427_STDPERIPH_SRC}
-        COMPILE_DEFINITIONS ${STM32F427_COMPILE_DEFINITIONS}
-        LINKER_SCRIPT stm32_flash_f427xg
-        SVD STM32F411
+        STARTUP startup_at32f435_437.s
+        SOURCES ${AT32F43_STDPERIPH_SRC}
+        COMPILE_DEFINITIONS ${at32f43x_xMT7_COMPILE_DEFINITIONS}
+        LINKER_SCRIPT at32_flash_f43xM
+        SVD at32f43x_xMT7
         ${ARGN}
     )
 endfunction()

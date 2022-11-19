@@ -58,16 +58,8 @@
 #endif
 
 #elif defined(AT32F43x)
-// todo 
-#include "stm32f7xx.h"
-#include "stm32f7xx_hal.h"
-#include "stm32f7xx_hal_rtc.h"
-#include "stm32f7xx_ll_spi.h"
-#include "stm32f7xx_ll_gpio.h"
-#include "stm32f7xx_ll_dma.h"
-#include "stm32f7xx_ll_rcc.h"
-#include "stm32f7xx_ll_bus.h"
-#include "stm32f7xx_ll_tim.h"
+// todo add .h file 
+#include "at32f435_437.h" 
 
 #define U_ID_0 (*(uint32_t*)0x1FFFF7E8)
 #define U_ID_1 (*(uint32_t*)0x1FFFF7EC)

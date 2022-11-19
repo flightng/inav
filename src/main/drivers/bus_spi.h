@@ -32,7 +32,26 @@
 #define SPI_IO_AF_SCK_CFG_LOW   IO_CONFIG(GPIO_MODE_AF_PP, GPIO_SPEED_FREQ_VERY_HIGH, GPIO_PULLDOWN)
 #define SPI_IO_AF_MISO_CFG      IO_CONFIG(GPIO_MODE_AF_PP, GPIO_SPEED_FREQ_VERY_HIGH, GPIO_PULLUP)
 #define SPI_IO_CS_CFG           IO_CONFIG(GPIO_MODE_OUTPUT_PP, GPIO_SPEED_FREQ_VERY_HIGH, GPIO_NOPULL)
+#elif defined(AT32F43x)
+#define SPI_IO_AF_CFG           IO_CONFIG(GPIO_MODE_MUX,  GPIO_DRIVE_STRENGTH_STRONGER, GPIO_OUTPUT_PUSH_PULL, GPIO_PULL_NONE)
+#define SPI_IO_AF_SCK_CFG       IO_CONFIG(GPIO_MODE_MUX,  GPIO_DRIVE_STRENGTH_STRONGER, GPIO_OUTPUT_PUSH_PULL, GPIO_PULL_DOWN)
+#define SPI_IO_AF_MISO_CFG      IO_CONFIG(GPIO_MODE_MUX,  GPIO_DRIVE_STRENGTH_STRONGER, GPIO_OUTPUT_PUSH_PULL, GPIO_PULL_UP)
+#define SPI_IO_CS_CFG           IO_CONFIG(GPIO_MODE_OUTPUT, GPIO_DRIVE_STRENGTH_STRONGER, GPIO_OUTPUT_PUSH_PULL, GPIO_PULL_NONE)
 #endif
+
+#define IOCFG_OUT_PP         IO_CONFIG(GPIO_MODE_OUTPUT, GPIO_DRIVE_STRENGTH_STRONGER, GPIO_OUTPUT_PUSH_PULL, GPIO_PULL_NONE)  // TODO
+#define IOCFG_OUT_PP_25      IO_CONFIG(GPIO_MODE_OUTPUT, GPIO_DRIVE_STRENGTH_MODERATE, GPIO_OUTPUT_PUSH_PULL, GPIO_PULL_NONE)
+#define IOCFG_OUT_OD         IO_CONFIG(GPIO_MODE_OUTPUT, GPIO_DRIVE_STRENGTH_MODERATE, GPIO_OUTPUT_OPEN_DRAIN, GPIO_PULL_NONE)
+#define IOCFG_AF_PP_FAST     IO_CONFIG(GPIO_MODE_MUX,  GPIO_DRIVE_STRENGTH_STRONGER, GPIO_OUTPUT_PUSH_PULL, GPIO_PULL_DOWN)
+#define IOCFG_AF_PP          IO_CONFIG(GPIO_MODE_MUX,  GPIO_DRIVE_STRENGTH_STRONGER, GPIO_OUTPUT_PUSH_PULL, GPIO_PULL_NONE)
+#define IOCFG_AF_PP_PD       IO_CONFIG(GPIO_MODE_MUX,  GPIO_DRIVE_STRENGTH_STRONGER, GPIO_OUTPUT_PUSH_PULL, GPIO_PULL_DOWN)
+#define IOCFG_AF_PP_UP       IO_CONFIG(GPIO_MODE_MUX,  GPIO_DRIVE_STRENGTH_STRONGER, GPIO_OUTPUT_PUSH_PULL, GPIO_PULL_UP)
+#define IOCFG_AF_OD          IO_CONFIG(GPIO_MODE_MUX,  GPIO_DRIVE_STRENGTH_STRONGER, GPIO_OUTPUT_OPEN_DRAIN, GPIO_PULL_NONE)
+#define IOCFG_AF_OD_UP       IO_CONFIG(GPIO_MODE_MUX,  GPIO_DRIVE_STRENGTH_STRONGER, GPIO_OUTPUT_OPEN_DRAIN, GPIO_PULL_UP)
+#define IOCFG_IPD            IO_CONFIG(GPIO_MODE_INPUT,  GPIO_DRIVE_STRENGTH_MODERATE, GPIO_OUTPUT_PUSH_PULL, GPIO_PULL_DOWN)
+#define IOCFG_IPU            IO_CONFIG(GPIO_MODE_INPUT,  GPIO_DRIVE_STRENGTH_MODERATE, GPIO_OUTPUT_PUSH_PULL, GPIO_PULL_UP)
+#define IOCFG_IN_FLOATING    IO_CONFIG(GPIO_MODE_INPUT,  GPIO_DRIVE_STRENGTH_MODERATE, GPIO_OUTPUT_PUSH_PULL, GPIO_PULL_NONE)
+#define IOCFG_IPU_25         IO_CONFIG(GPIO_MODE_INPUT,  GPIO_DRIVE_STRENGTH_MODERATE, GPIO_OUTPUT_PUSH_PULL, GPIO_PULL_UP)
 
 /*
   Flash M25p16 tolerates 20mhz, SPI_CLOCK_FAST should sit around 20 or less.
@@ -56,14 +75,18 @@ typedef enum SPIDevice {
 
 #if defined(STM32F4)
 #define SPIDEV_COUNT 3
-#elif defined(STM32F7) || defined(STM32H7)
+#elif defined(STM32F7) || defined(STM32H7)|| defined(AT32F43x)
 #define SPIDEV_COUNT 4
 #else
 #define SPIDEV_COUNT 4
 #endif
-
+//|| defined(AT32F43x)
 typedef struct SPIDevice_s {
-    SPI_TypeDef *dev;
+    #if defined(AT32F43x)
+     spi_type *dev;
+    #else
+     SPI_TypeDef *dev;
+    #endif
     ioTag_t nss;
     ioTag_t sck;
     ioTag_t mosi;
@@ -82,12 +105,27 @@ typedef struct SPIDevice_s {
 } spiDevice_t;
 
 bool spiInitDevice(SPIDevice device, bool leadingEdge);
-bool spiIsBusBusy(SPI_TypeDef *instance);
-void spiSetSpeed(SPI_TypeDef *instance, SPIClockSpeed_e speed);
-uint8_t spiTransferByte(SPI_TypeDef *instance, uint8_t in);
-bool spiTransfer(SPI_TypeDef *instance, uint8_t *rxData, const uint8_t *txData, int len);
 
-uint16_t spiGetErrorCounter(SPI_TypeDef *instance);
-void spiResetErrorCounter(SPI_TypeDef *instance);
-SPIDevice spiDeviceByInstance(SPI_TypeDef *instance);
-SPI_TypeDef * spiInstanceByDevice(SPIDevice device);
+ #if defined(AT32F43x)
+
+    bool spiIsBusBusy(spi_type *instance);
+    void spiSetSpeed(spi_type *instance, SPIClockSpeed_e speed);
+    uint8_t spiTransferByte(spi_type *instance, uint8_t in);
+    bool spiTransfer(spi_type *instance, uint8_t *rxData, const uint8_t *txData, int len);
+
+    uint16_t spiGetErrorCounter(spi_type *instance);
+    void spiResetErrorCounter(spi_type *instance);
+    SPIDevice spiDeviceByInstance(spi_type *instance);
+    spi_type * spiInstanceByDevice(spi_type device);
+
+#else
+    bool spiIsBusBusy(SPI_TypeDef *instance);
+    void spiSetSpeed(SPI_TypeDef *instance, SPIClockSpeed_e speed);
+    uint8_t spiTransferByte(SPI_TypeDef *instance, uint8_t in);
+    bool spiTransfer(SPI_TypeDef *instance, uint8_t *rxData, const uint8_t *txData, int len);
+
+    uint16_t spiGetErrorCounter(SPI_TypeDef *instance);
+    void spiResetErrorCounter(SPI_TypeDef *instance);
+    SPIDevice spiDeviceByInstance(SPI_TypeDef *instance);
+    SPI_TypeDef * spiInstanceByDevice(SPIDevice device);
+#endif

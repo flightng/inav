@@ -47,12 +47,16 @@ typedef enum I2CDevice {
 } I2CDevice;
 
 typedef struct i2cDevice_s {
+    #if defined(AT32F43x) 
+    i2c_type *dev;
+    #else
     I2C_TypeDef *dev;
+    #endif
     ioTag_t scl;
     ioTag_t sda;
     rccPeriphTag_t rcc;
     I2CSpeed speed;
-#if defined(STM32F7) || defined(STM32H7)
+#if defined(STM32F7) || defined(STM32H7) || defined(AT32F43x) 
     uint8_t ev_irq;
     uint8_t er_irq;
     uint8_t af;

@@ -38,6 +38,11 @@
 #include "stm32f7xx.h"
 #endif
 
+#ifdef AT32F43x
+#include "at32f435_437.h"
+#endif
+
+
  /* SDCARD pinouts
  *
  * SD CARD PINS
@@ -137,7 +142,7 @@ typedef struct
     uint8_t  PERFORMANCE_MOVE;        // Carries information about the card's performance move
     uint8_t  AU_SIZE;                 // Carries information about the card's allocation unit size
     uint16_t ERASE_SIZE;              // Determines the number of AUs to be erased in one operation
-    uint8_t  ERASE_TIMEOUT;           // Determines the TimeOut for any number of AU erase
+    uint8_t  SD_ERASE_TIMEOUT;           // Determines the TimeOut for any number of AU erase
     uint8_t  ERASE_OFFSET;            // Carries information about the erase offset
 } SD_CardStatus_t;
 
@@ -221,8 +226,14 @@ typedef struct
 
 extern           SD_CardInfo_t               SD_CardInfo;
 extern           SD_CardType_t               SD_CardType;
-
+#ifdef AT32F43x
+// TODO:sd卡还不支持，待处理
+void             SD_Initialize_LL            (dma_channel_type *dma);
+#else
 void             SD_Initialize_LL            (DMA_Stream_TypeDef *dma);
+#endif
+
+
 bool             SD_Init                     (void);
 bool             SD_IsDetected				(void);
 bool             SD_GetState                 (void);

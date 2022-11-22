@@ -93,5 +93,11 @@ extern adc_config_t adcConfig[ADC_CHN_COUNT];
 extern volatile ADC_VALUES_ALIGNMENT(uint16_t adcValues[ADCDEV_COUNT][ADC_CHN_COUNT * ADC_AVERAGE_N_SAMPLES]);
 
 void adcHardwareInit(drv_adc_config_t *init);
-ADCDevice adcDeviceByInstance(ADC_TypeDef *instance);
+
+#if defined(AT32F43x) 
+    ADCDevice adcDeviceByInstance(adc_type *instance);
+#else
+    ADCDevice adcDeviceByInstance(ADC_TypeDef *instance);
+#endif
+
 uint32_t adcChannelByTag(ioTag_t ioTag);

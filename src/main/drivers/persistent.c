@@ -35,14 +35,14 @@
 
     uint32_t persistentObjectRead(persistentObjectId_e id)
     {
-        uint32_t value = ertc_bpr_data_read(id);
+        uint32_t value = ertc_bpr_data_read((ertc_dt_type)id);
         return value;
 
     }
 
     void persistentObjectWrite(persistentObjectId_e id, uint32_t value)
     {
-        ertc_bpr_data_write(id,value);
+        ertc_bpr_data_write((ertc_dt_type)id,value);
     }
     // examples ertc 
     void persistentObjectRTCEnable(void)
@@ -98,19 +98,19 @@
     }
 
 #else
-    uint32_t persistentObjectRead(persistentObjectId_e id)
-    {
-        uint32_t value = RTC_ReadBackupRegister(id);
+uint32_t persistentObjectRead(persistentObjectId_e id)
+{
+    uint32_t value = RTC_ReadBackupRegister(id);
 
-        return value;
-    }
+    return value;
+}
 
-    void persistentObjectWrite(persistentObjectId_e id, uint32_t value)
-    {
-        RTC_WriteBackupRegister(id, value);
-    }
+void persistentObjectWrite(persistentObjectId_e id, uint32_t value)
+{
+    RTC_WriteBackupRegister(id, value);
+}
 
-    void persistentObjectRTCEnable(void)
+void persistentObjectRTCEnable(void)
 {
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE); // Enable Access to PWR
     PWR_BackupAccessCmd(ENABLE); // Disable backup domain protection
@@ -119,22 +119,8 @@
 
     RTC_WriteProtectionCmd(ENABLE);  // Reset sequence
     RTC_WriteProtectionCmd(DISABLE); // Apply sequence
-
-    /* enable write access to bpr domain */
-	pwc_battery_powered_domain_access(TRUE);
-
-	/* clear tamper pin event pending flag */
-	bpr_flag_clear(BPR_TAMPER_EVENT_FLAG);
-	
-	bpr_data_write(BPR_DATA1, BPR_JUMP_FLAG);
-	
-	pwc_battery_powered_domain_access(FALSE);
-
-	/*system reset*/
-	NVIC_SystemReset();
-
-    
 }
+
 #endif
 
 void persistentObjectInit(void)

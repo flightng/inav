@@ -2,9 +2,10 @@ include(cortex-m4f)
 include(at32-stdperiph)
 include(at32f4-usb)
 
-set(AT32F4_STDPERIPH_DIR "${MAIN_LIB_DIR}/main/AT32F43x/Drivers/AT32F4xx_StdPeriph_Driver")
-set(AT32F4_CMSIS_DEVICE_DIR  "${MAIN_LIB_DIR}/main/AT32F43x/Drivers/CMSIS/Device/AT32F4xx")
+set(AT32F4_STDPERIPH_DIR "${MAIN_LIB_DIR}/main/AT32F43x/Drivers/AT32F43x_StdPeriph_Driver")
+set(AT32F4_CMSIS_DEVICE_DIR "${MAIN_LIB_DIR}/main/AT32F43x/Drivers/CMSIS/Device/ST/AT32F43x")
 set(AT32F4_CMSIS_DRIVERS_DIR "${MAIN_LIB_DIR}/main/AT32F43x/Drivers/CMSIS")
+
   
 # TODO  
 set(AT32F4_STDPERIPH_SRC_EXCLUDES
@@ -16,20 +17,21 @@ set(AT32F4_STDPERIPH_SRC_EXCLUDES
 
 set(AT32F4_STDPERIPH_SRC_DIR "${AT32F4_STDPERIPH_DIR}/src")
 glob_except(AT32F4_STDPERIPH_SRC "${AT32F4_STDPERIPH_SRC_DIR}/*.c" "${AT32F4_STDPERIPH_SRC_EXCLUDES}")
-
+ 
+list(APPEND AT32F4_STDPERIPH_SRC "${AT32F4_CMSIS_DEVICE_DIR}/at32f435_437_clock.c" )
 
 main_sources(AT32F4_SRC
     target/system_at32f435_437.c
-
     config/config_streamer_at32f43x.c
     config/config_streamer_ram.c
-    config/config_streamer_extflash.c
-
+    config/config_streamer_extflash.c 
     drivers/adc_at32f43x.c
+    drivers/i2c_application.c
     drivers/bus_i2c_at32f43x.c
     drivers/bus_spi_at32f43x
     drivers/serial_uart_hal_at32f43x.c
     drivers/serial_uart_at32f43x.c
+
     drivers/system_at32f43x.c
     drivers/timer.c
     drivers/timer_impl_stdperiph_at32.c
@@ -39,15 +41,17 @@ main_sources(AT32F4_SRC
 )
  
 set(AT32F4_INCLUDE_DIRS
-    "${CMSIS_INCLUDE_DIR}"
-    "${CMSIS_DSP_INCLUDE_DIR}"
-    "${AT32F4_STDPERIPH_DIR}/inc"
-    "${AT32F4_CMSIS_DEVICE_DIR}"
-    "${AT32F4_CMSIS_DRIVERS_DIR}"
+    ${CMSIS_INCLUDE_DIR}
+    ${CMSIS_DSP_INCLUDE_DIR}
+    ${AT32F4_CMSIS_DRIVERS_DIR}
+    ${AT32F4_STDPERIPH_DIR}/inc
+    ${AT32F4_CMSIS_DEVICE_DIR}
+    #"${AT32F4_I2C_DIR}"
 )
 
 set(AT32F4_DEFINITIONS
     ${CORTEX_M4F_DEFINITIONS}
+    AT32F43x
     USE_STDPERIPH_DRIVER
 )
 
@@ -83,7 +87,7 @@ function(target_at32f43x_xMT7 name)
     target_at32f43x(
         NAME ${name}
         STARTUP startup_at32f435_437.s
-        SOURCES ${AT32F43_STDPERIPH_SRC}
+        SOURCES ${AT32F4_STDPERIPH_SRC}
         COMPILE_DEFINITIONS ${at32f43x_xMT7_COMPILE_DEFINITIONS}
         LINKER_SCRIPT at32_flash_f43xM
         SVD at32f43x_xMT7

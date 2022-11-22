@@ -236,9 +236,9 @@ void uartIrqHandler(uartPort_t *s)
     // todo set of RESET
     if (usart_flag_get(s->USARTx, USART_RDBF_FLAG) == SET) {
         if (s->port.rxCallback) {
-            s->port.rxCallback(s->USARTx->DR, s->port.rxCallbackData);
+            s->port.rxCallback(s->USARTx->dt, s->port.rxCallbackData);
         } else {
-            s->port.rxBuffer[s->port.rxBufferHead] = s->USARTx->DR;
+            s->port.rxBuffer[s->port.rxBufferHead] = s->USARTx->dt;
             s->port.rxBufferHead = (s->port.rxBufferHead + 1) % s->port.rxBufferSize;
         }
     }

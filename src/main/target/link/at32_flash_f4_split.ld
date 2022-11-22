@@ -76,6 +76,7 @@ SECTIONS
     _etext = .;        /* define a global symbols at end of code */
   } >FLASH1
   
+  
     /* Critical program code goes into ZW RAM1 */
   /* Copy specific fast-executing code to ITCM RAM */ 
   tcm_code = LOADADDR(.tcm_code); 
@@ -97,6 +98,13 @@ SECTIONS
       __exidx_end = .;
     } >MOVABLE_FLASH
 
+  .busdev_registry :
+  {
+    PROVIDE_HIDDEN (__busdev_registry_start = .);
+    KEEP (*(.busdev_registry))
+    KEEP (*(SORT(.busdev_registry.*)))
+    PROVIDE_HIDDEN (__busdev_registry_end = .);
+  } >MOVABLE_FLASH
   .preinit_array     :
   {
     PROVIDE_HIDDEN (__preinit_array_start = .);

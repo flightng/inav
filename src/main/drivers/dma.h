@@ -123,9 +123,10 @@ DMA_t dmaGetByRef(const DMA_Stream_TypeDef * ref);
                                         .ref = DMA##d##_CHANNEL##s, \
                                         .irqHandlerCallback = NULL, \
                                         .flagsShift = f, \
-                                        .irqNumber = DMA##d##_CHANNEL##s##_IRQn, \
+                                        .irqNumber = DMA##d##_Channel##s##_IRQn, \
                                         .userParam = 0 \
                                     }
+
 /* 
 EDMA
 #define DEFINE_EDMA_CHANNEL(d, s, f) { \

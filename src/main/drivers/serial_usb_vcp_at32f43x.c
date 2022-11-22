@@ -16,6 +16,7 @@
  */
 
 #include <stdint.h>
+
 #include <stdbool.h>
 
 #include "platform.h"
@@ -26,6 +27,7 @@
 
 #include "common/utils.h"
 #include "drivers/io.h"
+#include "build/atomic.h"
 
 #include "usb_conf.h"
 #include "usb_core.h"
@@ -40,6 +42,7 @@
 #include "serial_usb_vcp_at32f43x.h"
 #include "nvic.h"
 #include "at32f435_437_tmr.h"  
+#include "stddef.h"
 
 otg_core_type otg_core_struct;
 #define USB_TIMEOUT  50
@@ -230,8 +233,7 @@ uint32_t CDC_Send_FreeBytes(void)
         but without the impact of the condition check.
     */
     uint32_t freeBytes;
-
-    ATOMIC_BLOCK(NVIC_BUILD_PRIORITY(6, 0)) {
+    ATOMIC_BLOCK(NVIC_PRIO_USB) {
         freeBytes = ((UserTxBufPtrOut - UserTxBufPtrIn) + (-((int)(UserTxBufPtrOut <= UserTxBufPtrIn)) & APP_TX_DATA_SIZE)) - 1;
     }
 
@@ -253,7 +255,8 @@ uint32_t CDC_Send_DATA(const uint8_t *ptrBuffer, uint32_t sendLength)
             // block until there is free space in the ring buffer
             delay(1);
         }
-        ATOMIC_BLOCK(NVIC_BUILD_PRIORITY(6, 0)) { // Paranoia
+
+        ATOMIC_BLOCK(NVIC_PRIO_USB) {
             UserTxBuffer[UserTxBufPtrIn] = ptrBuffer[i];
             UserTxBufPtrIn = (UserTxBufPtrIn + 1) % APP_TX_DATA_SIZE;
         }

@@ -19,13 +19,13 @@
 #include <stdint.h>
 
 #include <platform.h>
-
+#include "io_impl.h"
 #include "drivers/io.h"
 #include "drivers/time.h"
-
+#include "rcc.h"
 #include "drivers/bus_i2c.h"
 #include "drivers/nvic.h"
-#include "io_impl.h"
+#include "drivers/i2c_application.h"
 
 
 #if !defined(SOFT_I2C) && defined(USE_I2C)
@@ -284,7 +284,7 @@ void i2cInit(I2CDevice device)
     i2cState_t * state = &(i2cState[device]);
 
     //I2C_HandleTypeDef * pHandle = &state->handle;
-    i2c_handle_type  pHandle = &state->handle;
+    i2c_handle_type * pHandle = &state->handle;
 
     if (hardware->dev == NULL)
         return;

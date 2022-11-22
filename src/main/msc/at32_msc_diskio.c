@@ -85,7 +85,7 @@ usb_sts_type msc_disk_read(
     uint32_t blk_len)   // nmber of blocks to be read
 {
     UNUSED(lun);
-    mscSetActive();
+    //mscSetActive();
     emfat_read(&emfat, buf, blk_addr/SCSI_BLOCK_SIZE , blk_len/SCSI_BLOCK_SIZE);
     return USB_OK;
 }

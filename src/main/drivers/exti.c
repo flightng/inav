@@ -65,8 +65,8 @@ void EXTIInit(void)
 #if defined(STM32F4)
     /* Enable SYSCFG clock otherwise the EXTI irq handlers are not called */
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
-#elif defined(AT32F43x)  // todo
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+#elif defined(AT32F43x)  
+    crm_periph_clock_enable(CRM_SCFG_PERIPH_CLOCK, TRUE);
 #endif
     memset(extiChannelRecs, 0, sizeof(extiChannelRecs));
     memset(extiGroupPriority, 0xff, sizeof(extiGroupPriority));

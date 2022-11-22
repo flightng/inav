@@ -82,7 +82,7 @@ else()
 endif()
 
 set(AT32_LINK_OPTIONS
-    -nostartfiles
+    #-nostartfiles
     --specs=nano.specs
     -static
     -Wl,-gc-sections

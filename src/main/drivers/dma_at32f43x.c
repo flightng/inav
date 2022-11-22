@@ -31,34 +31,31 @@
  * DMA descriptors.
  */
 static dmaChannelDescriptor_t dmaDescriptors[] = {
-    [0]  = DEFINE_DMA_CHANNEL(1, 0, 0),     // DMA1_ST0
-    [1]  = DEFINE_DMA_CHANNEL(1, 1, 4),     // DMA1_ST1
-    [2]  = DEFINE_DMA_CHANNEL(1, 2, 8),    // DMA1_ST2
-    [3]  = DEFINE_DMA_CHANNEL(1, 3, 12),    // DMA1_ST3
-    [4]  = DEFINE_DMA_CHANNEL(1, 4, 16),    // DMA1_ST4
-    [5]  = DEFINE_DMA_CHANNEL(1, 5, 20),    // DMA1_ST5
-    [6]  = DEFINE_DMA_CHANNEL(1, 6, 24),    // DMA1_ST6
-    [7]  = DEFINE_DMA_CHANNEL(1, 7, 28),    // DMA1_ST7
+    [0]  = DEFINE_DMA_CHANNEL(1, 1, 0),     // DMA1_ST1
+    [1]  = DEFINE_DMA_CHANNEL(1, 2, 4),     // DMA1_ST2
+    [2]  = DEFINE_DMA_CHANNEL(1, 3, 8),    // DMA1_ST3
+    [3]  = DEFINE_DMA_CHANNEL(1, 4, 12),    // DMA1_ST4
+    [4]  = DEFINE_DMA_CHANNEL(1, 5, 16),    // DMA1_ST5
+    [5]  = DEFINE_DMA_CHANNEL(1, 6, 20),    // DMA1_ST6
+    [6]  = DEFINE_DMA_CHANNEL(1, 7, 24),    // DMA1_ST7
 
-    [8]  = DEFINE_DMA_CHANNEL(2, 0, 0),     // DMA2_ST0
-    [9]  = DEFINE_DMA_CHANNEL(2, 1, 4),     // DMA2_ST1
-    [10] = DEFINE_DMA_CHANNEL(2, 2, 8),    // DMA2_ST2
-    [11] = DEFINE_DMA_CHANNEL(2, 3, 12),    // DMA2_ST3
-    [12] = DEFINE_DMA_CHANNEL(2, 4, 16),    // DMA2_ST4
-    [13] = DEFINE_DMA_CHANNEL(2, 5, 20),    // DMA2_ST5
-    [14] = DEFINE_DMA_CHANNEL(2, 6, 24),    // DMA2_ST6
-    [15] = DEFINE_DMA_CHANNEL(2, 7, 28)     // DMA2_ST7
+    [7]  = DEFINE_DMA_CHANNEL(2, 1, 0),     // DMA2_ST1
+    [8] = DEFINE_DMA_CHANNEL(2, 2, 4),    // DMA2_ST2
+    [9] = DEFINE_DMA_CHANNEL(2, 3, 8),    // DMA2_ST3
+    [10] = DEFINE_DMA_CHANNEL(2, 4, 12),    // DMA2_ST4
+    [11] = DEFINE_DMA_CHANNEL(2, 5, 16),    // DMA2_ST5
+    [12] = DEFINE_DMA_CHANNEL(2, 6, 20),    // DMA2_ST6
+    [13] = DEFINE_DMA_CHANNEL(2, 7, 24)     // DMA2_ST7
     /*
     //EDMA
-     [16] = DEFINE_EDMA_CHANNEL(0, 0, 0),     // EDMA_0
-    [17] = DEFINE_EDMA_CHANNEL(0, 1, 6),     // EDMA_1
-    [18] = DEFINE_EDMA_CHANNEL(0, 2, 12),    // EDMA_2
-    [19] = DEFINE_EDMA_CHANNEL(0, 3, 18),    // EDMA_3
-    [20] = DEFINE_EDMA_CHANNEL(0, 4, 24),    // EDMA_4
-    [21] = DEFINE_EDMA_CHANNEL(0, 5, 30),    // EDMA_5
-    [22] = DEFINE_EDMA_CHANNEL(0, 6, 36),    // EDMA_6
-    [23] = DEFINE_EDMA_CHANNEL(0, 7, 42)     // EDMA_7
-    [24] = DEFINE_EDMA_CHANNEL(0, 8, 48)     // EDMA_8
+    [14] = DEFINE_EDMA_CHANNEL(0, 1, 6),     // EDMA_1
+    [15] = DEFINE_EDMA_CHANNEL(0, 2, 12),    // EDMA_2
+    [16] = DEFINE_EDMA_CHANNEL(0, 3, 18),    // EDMA_3
+    [17] = DEFINE_EDMA_CHANNEL(0, 4, 24),    // EDMA_4
+    [18] = DEFINE_EDMA_CHANNEL(0, 5, 30),    // EDMA_5
+    [19] = DEFINE_EDMA_CHANNEL(0, 6, 36),    // EDMA_6
+    [20] = DEFINE_EDMA_CHANNEL(0, 7, 42)     // EDMA_7
+    [21] = DEFINE_EDMA_CHANNEL(0, 8, 48)     // EDMA_8
     */
 };
 
@@ -141,9 +138,12 @@ void dmaSetHandler(DMA_t dma, dmaCallbackHandlerFuncPtr callback, uint32_t prior
 uint32_t dmaGetChannelByTag(dmaTag_t tag)
 {
     // todo QA  DEFINE_DMA_CHANNEL 0 get index?  return DMA_Channel_0? 
-    // DMA1_Channel1 
-    static const uint32_t dmaChannel[8] = { DMA_Channel_0, DMA_Channel_1, DMA_Channel_2, DMA_Channel_3, DMA_Channel_4, DMA_Channel_5, DMA_Channel_6, DMA_Channel_7 };
-    return dmaChannel[DMATAG_GET_CHANNEL(tag)];
+    // DMA1_CHANNEL1 
+    static const uint32_t dmaChannel[4] = { DMA1_CHANNEL1, DMA1_CHANNEL2, DMA1_CHANNEL3, DMA1_CHANNEL4, DMA1_CHANNEL5, DMA1_CHANNEL6, DMA1_CHANNEL7, 
+    DMA2_CHANNEL1, DMA2_CHANNEL2, DMA2_CHANNEL3, DMA2_CHANNEL4, DMA2_CHANNEL5, DMA2_CHANNEL6, DMA2_CHANNEL7,
+     };
+
+    return dmaChannel[(DMATAG_GET_DMA(tag)-1)*7 + DMATAG_GET_STREAM(tag)-1];
 }
 
 DMA_t dmaGetByRef(const dma_channel_type* ref)

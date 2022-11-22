@@ -62,8 +62,10 @@ void cycleCounterInit(void)
     // Enable DWT for precision time measurement
     CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
 
-    #if defined(STM32F7) || defined(STM32H7)||defined(AT32F43x)
+    #if defined(STM32F7) || defined(STM32H7)
         DWT->LAR = DWT_LAR_UNLOCK_VALUE;
+    #elif defined(AT32F43x)
+      ITM->LAR = DWT_LAR_UNLOCK_VALUE;
     #elif defined(STM32F4)
         volatile uint32_t *DWTLAR = (uint32_t *)(DWT_BASE + 0x0FB0);
         *(DWTLAR) = DWT_LAR_UNLOCK_VALUE;

@@ -37,8 +37,8 @@
 #endif
 
 static adcDevice_t adcHardware[ADCDEV_COUNT] = {
-    { .ADCx = ADC1, .rccADC = RCC_APB2(ADC1), .rccDMA = RCC_AHB1(DMA2), .DMAy_Streamx = ADC1_DMA_STREAM, .channel = DMA_Channel_0, .enabled = false, .usedChannelCount = 0 },
-    //{ .ADCx = ADC2, .rccADC = RCC_APB2(ADC2), .rccDMA = RCC_AHB1(DMA2), .DMAy_Streamx = DMA2_Stream1, .channel = DMA_Channel_0, .enabled = false, .usedChannelCount = 0 }
+    { .ADCx = ADC1, .rccADC = RCC_APB2(ADC1), .rccDMA = RCC_AHB1(DMA2), .DMAy_Channelx = ADC1_DMA_STREAM, .enabled = false, .usedChannelCount = 0 },
+
 };
 
 /* note these could be packed up for saving space */
@@ -61,7 +61,7 @@ const adcTagMap_t adcTagMap[] = {
     { DEFIO_TAG_E__PA7, ADC_CHANNEL_7  },
 };
 
-ADCDevice adcDeviceByInstance(ADC_TypeDef *instance)
+ADCDevice adcDeviceByInstance(adc_type *instance)
 {
     if (instance == ADC1)
         return ADCDEV_1;
@@ -78,9 +78,9 @@ static void adcInstanceInit(ADCDevice adcDevice)
     adcDevice_t * adc = &adcHardware[adcDevice];
     RCC_ClockCmd(adc->rccDMA, ENABLE);
     RCC_ClockCmd(adc->rccADC, ENABLE);
-    dma_reset(adc->DMAy_Streamx); 
+    dma_reset(adc->DMAy_Channelx); 
     dma_default_para_init(&dma_init_struct);
-    dma_init_struct.peripheral_base_addr = (uint32_t)&adc->ADCx->DR;
+    dma_init_struct.peripheral_base_addr = (uint32_t)&adc->ADCx->odt;
     dma_init_struct.buffer_size = adc->usedChannelCount * ADC_AVERAGE_N_SAMPLES;
     dma_init_struct.peripheral_inc_enable = FALSE;
     dma_init_struct.memory_inc_enable =  ((adc->usedChannelCount > 1) || (ADC_AVERAGE_N_SAMPLES > 1)) ? TRUE : FALSE;
@@ -90,13 +90,13 @@ static void adcInstanceInit(ADCDevice adcDevice)
     dma_init_struct.memory_data_width = DMA_MEMORY_DATA_WIDTH_HALFWORD;
     dma_init_struct.peripheral_data_width = DMA_PERIPHERAL_DATA_WIDTH_HALFWORD;  
     dma_init_struct.priority = DMA_PRIORITY_HIGH;
-    dma_init(adc->DMAy_Streamx, &dma_init_struct);
+    dma_init(adc->DMAy_Channelx, &dma_init_struct);
 
     //dmamux_enable(adc->rccDMA, TRUE);
     //dmamux_init(DMA1MUX_CHANNEL1, DMAMUX_DMAREQ_ID_ADC1);
     // todo 
-    //dma_interrupt_enable(adc->DMAy_Streamx, DMA_FDT_INT, TRUE);
-    dma_channel_enable(adc->DMAy_Streamx,TRUE);
+    //dma_interrupt_enable(adc->dma_init_type, DMA_FDT_INT, TRUE);
+    dma_channel_enable(adc->DMAy_Channelx,TRUE);
       
     // adc begin
     // ADC_CommonStructInit(&ADC_CommonInitStructure);
@@ -115,7 +115,7 @@ static void adcInstanceInit(ADCDevice adcDevice)
     adc_common_struct.tempervintrv_state = FALSE;
     adc_common_struct.common_dma_request_repeat_state = FALSE;
     adc_common_struct.vbat_state = FALSE;
-    adc_common_config(&adc_common_struct)
+    adc_common_config(&adc_common_struct);
 
     //  ADC_InitType ADC_InitStructure;
     // ADC_StructInit(&ADC_InitStructure); 

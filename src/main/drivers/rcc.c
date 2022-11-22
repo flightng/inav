@@ -59,11 +59,11 @@ void RCC_ClockCmd(rccPeriphTag_t periphTag, FunctionalState NewState)
                 break;
 
             case RCC_APB1:
-                RCC_BIT_CMD(RCC->apb1en, mask, NewState);
+                RCC_BIT_CMD(CRM->apb1en, mask, NewState);
                 break;
 
             case RCC_APB2:
-                RCC_BIT_CMD(RCC->apb2en, mask, NewState);
+                RCC_BIT_CMD(CRM->apb2en, mask, NewState);
                 break;
         #else 
             #if !(defined(STM32H7) || defined(STM32G4))

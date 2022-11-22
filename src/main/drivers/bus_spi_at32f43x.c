@@ -34,16 +34,17 @@
 #define SPI1_MISO_PIN   PA6
 #define SPI1_MOSI_PIN   PA7
 #endif
-
+// DEFIO_TAG__PD6 defio_error_PD6_is_not_supported_on_TARGET
+// TODO 使用PD报错
 #ifndef SPI2_SCK_PIN
-#define SPI2_NSS_PIN    PD5
-#define SPI2_SCK_PIN    PD1
-#define SPI2_MISO_PIN   PD3
-#define SPI2_MOSI_PIN   PD4
+#define SPI2_NSS_PIN    PB12
+#define SPI2_SCK_PIN    PB13
+#define SPI2_MISO_PIN   PB14
+#define SPI2_MOSI_PIN   PB15
 #endif
 
 #ifndef SPI3_SCK_PIN
-#define SPI3_NSS_PIN    PD6
+#define SPI3_NSS_PIN    PA15
 #define SPI3_SCK_PIN    PC10
 #define SPI3_MISO_PIN   PC11
 #define SPI3_MOSI_PIN   PC12
@@ -193,8 +194,9 @@ bool spiInitDevice(SPIDevice device, bool leadingEdge)
        spi_init_struct.clock_phase = SPI_CLOCK_PHASE_1EDGE;
     } else {
         // SPI_MODE3
-        spiInit.SPI_CPOL = SPI_CLOCK_POLARITY_HIGH;
-        spiInit.SPI_CPHA = SPI_CLOCK_PHASE_2EDGE;
+       spi_init_struct.clock_polarity = SPI_CLOCK_POLARITY_HIGH;
+       spi_init_struct.clock_phase = SPI_CLOCK_PHASE_2EDGE;
+
     }
     spi_crc_enable (spi->dev, TRUE); // 开启校验
     spi_init(spi->dev, &spi_init_struct);
@@ -253,7 +255,7 @@ bool spiTransfer(spi_type *instance, uint8_t *out, const uint8_t *in, int len)
 {
     uint16_t spiTimeout = 1000;
 
-    instance->DR;
+    instance->dt;
     while (len--) {
         uint8_t b = in ? *(in++) : 0xFF;
         while (spi_i2s_flag_get(instance, SPI_I2S_TDBE_FLAG) == RESET) {
@@ -315,7 +317,7 @@ void spiResetErrorCounter(spi_type *instance)
     }
 }
 
-spi_type * spiInstanceByDevice(SPIDevice device)
+spi_type * spiInstanceByDevice( SPIDevice device )
 {
     return spiHardwareMap[device].dev;
 }

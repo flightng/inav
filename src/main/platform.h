@@ -59,7 +59,8 @@
 
 #elif defined(AT32F43x)
 // todo add .h file 
-#include "at32f435_437.h" 
+#include "at32f435_437.h"  
+//#include "at32f435_437.h"  
 
 #define U_ID_0 (*(uint32_t*)0x1FFFF7E8)
 #define U_ID_1 (*(uint32_t*)0x1FFFF7EC)

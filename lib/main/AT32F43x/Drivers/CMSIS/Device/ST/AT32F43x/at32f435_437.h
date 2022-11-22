@@ -72,7 +72,7 @@ extern "C" {
     defined (AT32F435ZCT7) || defined (AT32F435ZGT7) || defined (AT32F435ZMT7)
 
     #define AT32F435xx
-    #define AT32F43x
+    //#define AT32F43x
 #endif
 
 #if defined (AT32F437RCT7) || defined (AT32F437RGT7) || defined (AT32F437RMT7) || \
@@ -80,7 +80,7 @@ extern "C" {
     defined (AT32F437ZCT7) || defined (AT32F437ZGT7) || defined (AT32F437ZMT7)
 
     #define AT32F437xx
-    #define AT32F43x
+    //#define AT32F43x
 #endif
 
 #ifndef USE_STDPERIPH_DRIVER
@@ -124,7 +124,7 @@ extern "C" {
 #define __MPU_PRESENT             1        /*!< mpu present                                  */
 #define __NVIC_PRIO_BITS          4        /*!< at32 uses 4 bits for the priority levels     */
 #define __Vendor_SysTickConfig    0        /*!< set to 1 if different systick config is used */
-#define __FPU_PRESENT             1U       /*!< fpu present                                  */
+//#define __FPU_PRESENT             1U       /*!< fpu present                                  */
 
 /**
   * @brief at32f435_437 interrupt number definition, according to the selected device

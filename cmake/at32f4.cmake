@@ -90,6 +90,7 @@ function(target_at32f43x_xMT7 name)
         SOURCES ${AT32F4_STDPERIPH_SRC}
         COMPILE_DEFINITIONS ${at32f43x_xMT7_COMPILE_DEFINITIONS}
         LINKER_SCRIPT at32_flash_f43xM
+        #BOOTLOADER
         SVD at32f43x_xMT7
         ${ARGN}
     )

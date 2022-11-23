@@ -308,7 +308,7 @@ void i2cInit(I2CDevice device)
     pHandle->i2cx = hardware->dev;
 
     // Compute TIMINGR value based on peripheral clock for this device instance
-    uint32_t i2cPclk; //未启用
+    //uint32_t i2cPclk; //未启用
 //todo 未使用计算算法，目前先写死
 #if defined(AT32F43x)  
     //i2cPclk = HAL_RCC_GetPCLK1Freq(); 

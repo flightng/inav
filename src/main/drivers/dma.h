@@ -27,7 +27,7 @@ typedef struct dmaChannelDescriptor_s * DMA_t;
 #if defined(UNIT_TEST)
 typedef uint32_t DMA_TypeDef;
 #endif
-// 高4位DMA，中4位 stream，低8位channel
+// 高4位DMA，中4位 stream=at32 channel，低8位channel,channel 未使用，
 #define DMA_TAG(dma, stream, channel)   ( (((dma) & 0x03) << 12) | (((stream) & 0x0F) << 8) | (((channel) & 0xFF) << 0) )
 #define DMA_NONE                        (0)
 
@@ -62,6 +62,7 @@ typedef void (*dmaCallbackHandlerFuncPtr)(DMA_t channelDescriptor);
         uint32_t                    userParam;
         resourceOwner_e             owner;
         uint8_t                     resourceIndex;
+        dmamux_channel_type	     * dmaMuxref;  //弹性通道  
     } dmaChannelDescriptor_t;
 
 #else
@@ -117,6 +118,7 @@ DMA_t dmaGetByRef(const DMA_Stream_TypeDef * ref);
 
 #elif defined(AT32F43x)
 // todo   DMA_TAG(d, s, 0) =>  DMA_TAG(d, s, s)
+// DMA1MUX_CHANNEL1
 #define DEFINE_DMA_CHANNEL(d, s, f) { \
                                         .tag = DMA_TAG(d, s, 0), \
                                         .dma = DMA##d, \
@@ -124,7 +126,8 @@ DMA_t dmaGetByRef(const DMA_Stream_TypeDef * ref);
                                         .irqHandlerCallback = NULL, \
                                         .flagsShift = f, \
                                         .irqNumber = DMA##d##_Channel##s##_IRQn, \
-                                        .userParam = 0 \
+                                        .userParam = 0, \
+                                        .dmaMuxref = (dmamux_channel_type *)DMA##d ## MUX_CHANNEL ##s \
                                     }
 
 /* 
@@ -151,6 +154,8 @@ EDMA
 #define DMA_GET_FLAG_STATUS(d, flag) (d->dma->sts & (flag << d->flagsShift))
 
 DMA_t dmaGetByRef(const dma_channel_type * ref);
+
+void dmaMuxEnable(DMA_t dma, uint32_t dmaMuxid);
 
 
 //EDMA_Stream1_IRQHandler

@@ -62,7 +62,10 @@ extern "C" {
   #endif
 #endif
 
-//#define UNUSED(x)                        (void)x /* to avoid gcc/g++ warnings */
+#if !defined(UNUSED)
+#define UNUSED(x)                        (void)x /* to avoid gcc/g++ warnings */
+#endif
+
 
 #ifdef __cplusplus
 }

@@ -67,6 +67,7 @@ typedef struct adcDevice_s {
     uint32_t channel;
 #elif defined(AT32F43x) 
     dma_channel_type* DMAy_Channelx;
+    uint32_t dmaMuxid; // 弹性映射 dmamux request type
 #else
     DMA_Channel_TypeDef* DMAy_Channelx;
 #endif

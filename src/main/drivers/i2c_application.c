@@ -1842,6 +1842,7 @@ i2c_status_type i2c_master_irq_handler_int(i2c_handle_type* hi2c)
 {
   if (i2c_flag_get(hi2c->i2cx, I2C_ACKFAIL_FLAG) != RESET)
   {
+     
     /* clear ackfail flag */
     i2c_flag_clear(hi2c->i2cx, I2C_ACKFAIL_FLAG);
 

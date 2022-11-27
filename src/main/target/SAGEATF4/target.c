@@ -26,7 +26,7 @@
 
 timerHardware_t timerHardware[] = {
 
-    DEF_TIM(TMR5, CH4, PA3, TIM_USE_PPM,                         0, 0), // PPM UART2_RX_PIN
+    DEF_TIM(TMR5, CH4, PA3, TIM_USE_PPM,  0, 0), 						// PPM UART2_RX_PIN
     DEF_TIM(TMR2, CH3, PB10, TIM_USE_ANY |TIM_USE_LED, 0,0), 			// PWM1 - LED MCO1 DMA1 CH2
 	DEF_TIM(TMR2, CH4, PB11,  TIM_USE_ANY |TIM_USE_BEEPER, 0,0), 		// PWM2 - BB DMA1 CH6
 

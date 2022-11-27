@@ -25,6 +25,7 @@
 #include "drivers/io.h"
 #include "io_impl.h"
 #include "rcc.h"
+#include "drivers/dma.h"
 
 #include "drivers/sensor.h"
 #include "drivers/accgyro/accgyro.h"
@@ -37,8 +38,7 @@
 #endif
 
 static adcDevice_t adcHardware[ADCDEV_COUNT] = {
-    { .ADCx = ADC1, .rccADC = RCC_APB2(ADC1), .rccDMA = RCC_AHB1(DMA2), .DMAy_Channelx = ADC1_DMA_STREAM, .enabled = false, .usedChannelCount = 0 },
-
+    { .ADCx = ADC1, .rccADC = RCC_APB2(ADC1), .rccDMA = RCC_AHB1(DMA2), .DMAy_Channelx = ADC1_DMA_STREAM, .dmaMuxid= DMAMUX_DMAREQ_ID_ADC1,.enabled = false, .usedChannelCount = 0 },
 };
 
 /* note these could be packed up for saving space */
@@ -71,16 +71,27 @@ ADCDevice adcDeviceByInstance(adc_type *instance)
 */
     return ADCINVALID;
 }
+
+// 通过DMA方式完成ADC采样
 static void adcInstanceInit(ADCDevice adcDevice)
 {
-
-    dma_init_type dma_init_struct = {0};
+    dma_init_type dma_init_struct;
     adcDevice_t * adc = &adcHardware[adcDevice];
-    RCC_ClockCmd(adc->rccDMA, ENABLE);
-    RCC_ClockCmd(adc->rccADC, ENABLE);
-    dma_reset(adc->DMAy_Channelx); 
+    // 去DMA取一个用于ADC的通道
+    DMA_t dmadac= dmaGetByRef(adc->DMAy_Channelx);
+    if(!dmadac)
+    {
+        return;
+    }
+    dmadac->dmaMuxref = adc->dmaMuxid;
+    // 开启时钟 adcDevice =0 、1、2、3
+    dmaInit(dmadac, OWNER_ADC, adcDevice);
+    // dma_channel_type
+    dma_reset(dmadac->ref); 
+
     dma_default_para_init(&dma_init_struct);
     dma_init_struct.peripheral_base_addr = (uint32_t)&adc->ADCx->odt;
+    // 起始地址=通道数*采样次数 
     dma_init_struct.buffer_size = adc->usedChannelCount * ADC_AVERAGE_N_SAMPLES;
     dma_init_struct.peripheral_inc_enable = FALSE;
     dma_init_struct.memory_inc_enable =  ((adc->usedChannelCount > 1) || (ADC_AVERAGE_N_SAMPLES > 1)) ? TRUE : FALSE;
@@ -90,22 +101,13 @@ static void adcInstanceInit(ADCDevice adcDevice)
     dma_init_struct.memory_data_width = DMA_MEMORY_DATA_WIDTH_HALFWORD;
     dma_init_struct.peripheral_data_width = DMA_PERIPHERAL_DATA_WIDTH_HALFWORD;  
     dma_init_struct.priority = DMA_PRIORITY_HIGH;
-    dma_init(adc->DMAy_Channelx, &dma_init_struct);
-
-    //dmamux_enable(adc->rccDMA, TRUE);
-    //dmamux_init(DMA1MUX_CHANNEL1, DMAMUX_DMAREQ_ID_ADC1);
-    // todo 
-    //dma_interrupt_enable(adc->dma_init_type, DMA_FDT_INT, TRUE);
-    dma_channel_enable(adc->DMAy_Channelx,TRUE);
-      
-    // adc begin
-    // ADC_CommonStructInit(&ADC_CommonInitStructure);
-    // ADC_CommonInitStructure.ADC_Mode             = ADC_Mode_Independent;
-    // ADC_CommonInitStructure.ADC_Prescaler        = ADC_Prescaler_Div8;
-    // ADC_CommonInitStructure.ADC_DMAAccessMode    = ADC_DMAAccessMode_Disabled;
-    // ADC_CommonInitStructure.ADC_TwoSamplingDelay = ADC_TwoSamplingDelay_5Cycles;
-    // ADC_CommonInit(&ADC_CommonInitStructure);
- 
+    dma_init(dmadac->ref, &dma_init_struct);
+    //开启中断
+    dma_interrupt_enable(dmadac->ref, DMA_FDT_INT, TRUE);
+    //设置DMA请求弹性映射，初始化时指定DMA2_CHANNEL1
+    dmaMuxEnable(dmadac, dmadac->dmaMuxref);// TODO 弹性设置
+    dma_channel_enable(dmadac->ref,TRUE);
+   
     adc_common_config_type adc_common_struct;
     adc_common_default_para_init(&adc_common_struct);
     adc_common_struct.combine_mode = ADC_INDEPENDENT_MODE;
@@ -117,17 +119,7 @@ static void adcInstanceInit(ADCDevice adcDevice)
     adc_common_struct.vbat_state = FALSE;
     adc_common_config(&adc_common_struct);
 
-    //  ADC_InitType ADC_InitStructure;
-    // ADC_StructInit(&ADC_InitStructure); 
-    // ADC_InitStructure.ADC_ContinuousConvMode       = ENABLE; 
-    // ADC_InitStructure.ADC_Resolution               = ADC_Resolution_12b;
-    // ADC_InitStructure.ADC_ExternalTrigConv         = ADC_ExternalTrigConv_T1_CC1;
-    // ADC_InitStructure.ADC_ExternalTrigConvEdge     = ADC_ExternalTrigConvEdge_None;
-    // ADC_InitStructure.ADC_DataAlign                = ADC_DataAlign_Right;
-    // ADC_InitStructure.ADC_NbrOfConversion          = adc->usedChannelCount;
-    // ADC_InitStructure.ADC_ScanConvMode             = adc->usedChannelCount > 1 ? ENABLE : DISABLE; // 1=scan more that one channel in group
-    // ADC_Init(adc->ADCx, &ADC_InitStructure);
-
+    RCC_ClockCmd(adc->rccADC, ENABLE);
     adc_base_config_type adc_base_struct;
     adc_base_default_para_init(&adc_base_struct);
     adc_base_struct.sequence_mode = TRUE;
@@ -145,43 +137,45 @@ static void adcInstanceInit(ADCDevice adcDevice)
         // ADC_RegularChannelConfig(adc->ADCx, adcConfig[i].adcChannel, rank++, adcConfig[i].sampleTime);
         adc_ordinary_channel_set(adc->ADCx, adcConfig[i].adcChannel, rank++, adcConfig[i].sampleTime);
     }
-    // todo use software trigger
-    //adc_ordinary_conversion_trigger_set(adc->ADCx, ADC_ORDINARY_TRIG_TMR1CH1, ADC_ORDINARY_TRIG_EDGE_NONE);
 
-    //ADC_DMARequestAfterLastTransferCmd(adc->ADCx, ENABLE);
-    //ADC_DMACmd(adc->ADCx, ENABLE);
-    //ADC_Cmd(adc->ADCx, ENABLE);
-    //ADC_SoftwareStartConv(adc->ADCx);
+    // DMA连续请求
     adc_dma_request_repeat_enable(adc->ADCx, TRUE);
     adc_dma_mode_enable(adc->ADCx, TRUE);
+
+    //enable over flow interupt 
     adc_interrupt_enable(adc->ADCx, ADC_OCCO_INT, TRUE);
+    
+    // 校准ADC
+    while(adc_flag_get(adc->ADCx, ADC_RDY_FLAG) == RESET);
+    //start calibration
+    adc_calibration_init(adc->ADCx);
+    while(adc_calibration_init_status_get(adc->ADCx));
+    adc_calibration_start(adc->ADCx);
+    while(adc_calibration_status_get(adc->ADCx));
+    //start adc
     adc_enable(adc->ADCx, TRUE);
     adc_ordinary_software_trigger_enable(adc->ADCx, TRUE);
-    //  while(adc_flag_get(adc->ADCx, ADC_RDY_FLAG) == RESET);
-    // /* adc calibration */
-    // adc_calibration_init(adc->ADCx);
-    // while(adc_calibration_init_status_get(adc->ADCx));
-    // adc_calibration_start(adc->ADCx);
-    // while(adc_calibration_status_get(adc->ADCx));
 }
 
+// 初始化IO，绑定ADC 通道
 void adcHardwareInit(drv_adc_config_t *init)
 {
     UNUSED(init);
     int configuredAdcChannels = 0;
-
+    
     for (int i = ADC_CHN_1; i < ADC_CHN_COUNT; i++) {
         if (!adcConfig[i].tag)
             continue;
-
+        // 只启用了ADC1
         adcDevice_t * adc = &adcHardware[adcConfig[i].adcDevice];
-
+        // 初始化ADC1的采集通道
         IOInit(IOGetByTag(adcConfig[i].tag), OWNER_ADC, RESOURCE_ADC_CH1 + (i - ADC_CHN_1), 0);
-         IOConfigGPIO(IOGetByTag(adcConfig[i].tag), IO_CONFIG(GPIO_MODE_ANALOG, 0, GPIO_OUTPUT_OPEN_DRAIN, GPIO_PULL_NONE));
+        IOConfigGPIO(IOGetByTag(adcConfig[i].tag), IO_CONFIG(GPIO_MODE_ANALOG, 0, GPIO_OUTPUT_OPEN_DRAIN, GPIO_PULL_NONE));
 
         adcConfig[i].adcChannel = adcChannelByTag(adcConfig[i].tag);
         adcConfig[i].dmaIndex = adc->usedChannelCount++; 
-        adcConfig[i].sampleTime = ADC_SAMPLETIME_247_5;// todo 
+        // ADC_SAMPLETIME_247_5
+        adcConfig[i].sampleTime = ADC_SAMPLETIME_6_5;
         adcConfig[i].enabled = true;
 
         adc->enabled = true;
@@ -190,9 +184,7 @@ void adcHardwareInit(drv_adc_config_t *init)
 
     if (configuredAdcChannels == 0)
         return;
-
-    //RCC_ADCCLKConfig(RCC_ADC12PLLCLK_Div256);  // 72 MHz divided by 256 = 281.25 kHz
-
+    //  设置ADC1，开启时钟，绑定DMA等
     for (int i = 0; i < ADCDEV_COUNT; i++) {
         if (adcHardware[i].enabled) {
             adcInstanceInit(i);

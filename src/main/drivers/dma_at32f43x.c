@@ -62,22 +62,22 @@ static dmaChannelDescriptor_t dmaDescriptors[] = {
 /*
  * DMA IRQ Handlers
  */
-DEFINE_DMA_IRQ_HANDLER(1, 0, 0)     // DMA1_ST0 = dmaDescriptors[0] 
-DEFINE_DMA_IRQ_HANDLER(1, 1, 1)
-DEFINE_DMA_IRQ_HANDLER(1, 2, 2)
-DEFINE_DMA_IRQ_HANDLER(1, 3, 3)
-DEFINE_DMA_IRQ_HANDLER(1, 4, 4)
-DEFINE_DMA_IRQ_HANDLER(1, 5, 5)
-DEFINE_DMA_IRQ_HANDLER(1, 6, 6)
-DEFINE_DMA_IRQ_HANDLER(1, 7, 7)
-DEFINE_DMA_IRQ_HANDLER(2, 0, 8)
-DEFINE_DMA_IRQ_HANDLER(2, 1, 9)
-DEFINE_DMA_IRQ_HANDLER(2, 2, 10)
-DEFINE_DMA_IRQ_HANDLER(2, 3, 11)
-DEFINE_DMA_IRQ_HANDLER(2, 4, 12)
-DEFINE_DMA_IRQ_HANDLER(2, 5, 13)
-DEFINE_DMA_IRQ_HANDLER(2, 6, 14)
-DEFINE_DMA_IRQ_HANDLER(2, 7, 15)
+
+DEFINE_DMA_IRQ_HANDLER(1, 1, 0)
+DEFINE_DMA_IRQ_HANDLER(1, 2, 1)
+DEFINE_DMA_IRQ_HANDLER(1, 3, 2)
+DEFINE_DMA_IRQ_HANDLER(1, 4, 3)
+DEFINE_DMA_IRQ_HANDLER(1, 5, 4)
+DEFINE_DMA_IRQ_HANDLER(1, 6, 5)
+DEFINE_DMA_IRQ_HANDLER(1, 7, 6)
+
+DEFINE_DMA_IRQ_HANDLER(2, 1, 7)
+DEFINE_DMA_IRQ_HANDLER(2, 2, 8)
+DEFINE_DMA_IRQ_HANDLER(2, 3, 9)
+DEFINE_DMA_IRQ_HANDLER(2, 4, 10)
+DEFINE_DMA_IRQ_HANDLER(2, 5, 11)
+DEFINE_DMA_IRQ_HANDLER(2, 6, 12)
+DEFINE_DMA_IRQ_HANDLER(2, 7, 13)
 /*
 // edma
 DEFINE_EDMA_IRQ_HANDLER(0, 0, 16)
@@ -111,6 +111,12 @@ void dmaEnableClock(DMA_t dma)
     else {
         RCC_ClockCmd(RCC_AHB1(DMA2), ENABLE);
     }
+    dmamux_enable(dma->dma,TRUE);
+}
+
+void dmaMuxEnable(DMA_t dma, uint32_t dmaMuxid)
+{ 
+	dmamux_init(dma->dmaMuxref, dmaMuxid);
 }
 
 resourceOwner_e dmaGetOwner(DMA_t dma)
@@ -132,20 +138,20 @@ void dmaSetHandler(DMA_t dma, dmaCallbackHandlerFuncPtr callback, uint32_t prior
     dma->irqHandlerCallback = callback;
     dma->userParam = userParam;
 	nvic_irq_enable(dma->irqNumber, priority,0);  
-    
+     
 }
-// todo unused
+// todo unused ,get ChannelByTag
 uint32_t dmaGetChannelByTag(dmaTag_t tag)
 {
-    // todo QA  DEFINE_DMA_CHANNEL 0 get index?  return DMA_Channel_0? 
     // DMA1_CHANNEL1 
-    static const uint32_t dmaChannel[4] = { DMA1_CHANNEL1, DMA1_CHANNEL2, DMA1_CHANNEL3, DMA1_CHANNEL4, DMA1_CHANNEL5, DMA1_CHANNEL6, DMA1_CHANNEL7, 
+    static const uint32_t dmaChannel[14] = { DMA1_CHANNEL1, DMA1_CHANNEL2, DMA1_CHANNEL3, DMA1_CHANNEL4, DMA1_CHANNEL5, DMA1_CHANNEL6, DMA1_CHANNEL7, 
     DMA2_CHANNEL1, DMA2_CHANNEL2, DMA2_CHANNEL3, DMA2_CHANNEL4, DMA2_CHANNEL5, DMA2_CHANNEL6, DMA2_CHANNEL7,
      };
 
     return dmaChannel[(DMATAG_GET_DMA(tag)-1)*7 + DMATAG_GET_STREAM(tag)-1];
 }
 
+// 通过DMA通道 获取DMA_t 
 DMA_t dmaGetByRef(const dma_channel_type* ref)
 {
     for (unsigned i = 0; i < ARRAYLEN(dmaDescriptors); i++) {

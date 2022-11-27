@@ -73,6 +73,7 @@ typedef struct timerHardware_s {
     uint8_t alternateFunction;
     uint32_t usageFlags;
     dmaTag_t dmaTag;
+    uint32_t dmaMuxid; //DMAMUX ID
 } timerHardware_t;
 #else
 typedef struct timerDef_s {

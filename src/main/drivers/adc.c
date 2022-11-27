@@ -91,6 +91,7 @@ uint16_t adcGetChannel(uint8_t function)
         for (int i = 0; i < ADC_AVERAGE_N_SAMPLES; i++) {
             acc += adcValues[adcConfig[channel].adcDevice][adcConfig[channel].dmaIndex + i * activeChannelCount[adcConfig[channel].adcDevice]];
         }
+        // 取平均值
         return acc / ADC_AVERAGE_N_SAMPLES;
 #endif
     } else {

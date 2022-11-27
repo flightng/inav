@@ -289,6 +289,7 @@ bool impl_timerPWMConfigChannelDMA(TCH_t * tch, void * dmaBuffer, uint8_t dmaBuf
     if (tch->dma == NULL) {
         return false;  
     }
+    tch->dma->dmaMuxref = tch->timHw->dmaMuxid;
 
     // If DMA is already in use - abort
     if (tch->dma->owner != OWNER_FREE) {
@@ -302,7 +303,7 @@ bool impl_timerPWMConfigChannelDMA(TCH_t * tch, void * dmaBuffer, uint8_t dmaBuf
     // todo cc 
     //TIM_ARRPreloadConfig(timer, ENABLE);
     // 启用或禁用 TMR 周期缓冲区
-     tmr_period_buffer_enable(timer,TRUE);
+    tmr_period_buffer_enable(timer,TRUE);
 
     //TIM_CCxCmd(timer, lookupTIMChannelTable[tch->timHw->channelIndex], TIM_CCx_Enable);
     tmr_channel_enable(timer, lookupTIMChannelTable[tch->timHw->channelIndex],TRUE);
@@ -310,13 +311,14 @@ bool impl_timerPWMConfigChannelDMA(TCH_t * tch, void * dmaBuffer, uint8_t dmaBuf
     //TIM_Cmd(timer, ENABLE);
     tmr_counter_enable(timer, TRUE);
     dmaInit(tch->dma, OWNER_TIMER, 0);
+    
     dmaSetHandler(tch->dma, impl_timerDMA_IRQHandler, NVIC_PRIO_TIMER_DMA, (uint32_t)tch);
 
     //DMA_DeInit(tch->dma->ref);
     dma_reset(tch->dma->ref);
     //DMA_Cmd(tch->dma->ref, DISABLE);
     dma_channel_enable(tch->dma->ref,FALSE);
-
+    
     //DMA_DeInit(tch->dma->ref);
     dma_reset(tch->dma->ref);
 
@@ -354,13 +356,22 @@ bool impl_timerPWMConfigChannelDMA(TCH_t * tch, void * dmaBuffer, uint8_t dmaBuf
     //dma_init(dmaGetChannelByTag(tch->timHw->dmaTag), &dma_init_struct);
     dma_init(tch->dma->ref, &dma_init_struct);
 
+    //TODO 设置DMA请求弹性映射
+    dmaMuxEnable(tch->dma, tch->timHw->dmaMuxid);
     //DMA_ITConfig(tch->dma->ref, DMA_IT_TC, ENABLE);
     dma_interrupt_enable(tch->dma->ref, DMA_IT_TCIF, TRUE);
+
     return true;
 }
 
 void impl_timerPWMPrepareDMA(TCH_t * tch, uint32_t dmaBufferElementCount)
-{
+{ 
+    tch->dma = dmaGetByTag(tch->timHw->dmaTag);
+    if (tch->dma == NULL) {
+        return false;  
+    }
+    tch->dma->dmaMuxref = tch->timHw->dmaMuxid;
+
     // Make sure we terminate any DMA transaction currently in progress
     // Clear the flag as well, so even if DMA transfer finishes while within ATOMIC_BLOCK
     // the resulting IRQ won't mess up the DMA state
@@ -373,6 +384,8 @@ void impl_timerPWMPrepareDMA(TCH_t * tch, uint32_t dmaBufferElementCount)
     }
     //DMA_SetCurrDataCounter(tch->dma->ref, dmaBufferElementCount); 
     dma_data_number_set(tch->dma->ref, dmaBufferElementCount); 
+     //TODO 设置DMA请求弹性映射
+    dmaMuxEnable(tch->dma, tch->dma->dmaMuxref);
     dma_channel_enable(tch->dma->ref,TRUE);
     tch->dmaState = TCH_DMA_READY;
 }

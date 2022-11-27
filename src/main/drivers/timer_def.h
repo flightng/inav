@@ -18,9 +18,10 @@
 #pragma once
 
 #include "drivers/dma.h"
-// todo 没看懂TMR和DMA的对应  DEF_TIM DEF_TIM_DMAMAP__D 
 // Macros expand to keep DMA descriptor table compatible with Betaflight
-//BTCH_TMR1_CH1N  
+//0  TMR3_CH1
+// DEF_TIM_DMAMAP_VARIANT__0,  DEF_TIM_DMA__BTCH_TMR3_CH1
+// DEF_TIM_DMAMAP__D(1, 4, 5)
 #define DEF_TIM_DMAMAP(variant, timch) CONCAT(DEF_TIM_DMAMAP__, PP_CALL(CONCAT(DEF_TIM_DMAMAP_VARIANT__, variant), CONCAT(DEF_TIM_DMA__, DEF_TIM_TCH2BTCH(timch)), DMA_VARIANT_MISSING, DMA_VARIANT_MISSING))
 #define DEF_TIM_DMAMAP_VARIANT__0(_0, ...)                                                                      _0
 #define DEF_TIM_DMAMAP_VARIANT__1(_0, _1, ...)                                                                  _1

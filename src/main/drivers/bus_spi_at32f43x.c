@@ -34,8 +34,7 @@
 #define SPI1_MISO_PIN   PA6
 #define SPI1_MOSI_PIN   PA7
 #endif
-// DEFIO_TAG__PD6 defio_error_PD6_is_not_supported_on_TARGET
-// TODO 使用PD报错
+
 #ifndef SPI2_SCK_PIN
 #define SPI2_NSS_PIN    PB12
 #define SPI2_SCK_PIN    PB13

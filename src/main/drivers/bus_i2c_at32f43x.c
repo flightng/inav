@@ -150,7 +150,15 @@ bool i2cWriteBuffer(I2CDevice device, uint8_t addr_, uint8_t reg_, uint8_t len_,
     }
     else {
         //status = HAL_I2C_Mem_Write(&state->handle, addr_ << 1, reg_, I2C_MEMADD_SIZE_8BIT, (uint8_t *)data, len_, I2C_DEFAULT_TIMEOUT);
-        status = i2c_memory_write(&state->handle,I2C_MEM_ADDR_WIDIH_8, addr_ << 1, reg_,  (uint8_t *)data, len_, I2C_DEFAULT_TIMEOUT);
+        status = i2c_memory_write_int(&state->handle,I2C_MEM_ADDR_WIDIH_8, addr_ << 1, reg_,  (uint8_t *)data, len_, I2C_DEFAULT_TIMEOUT);
+        if(status !=  I2C_OK)
+        {
+          /* wait for the stop flag to be set  */
+          i2c_wait_flag(&state->handle, I2C_STOPF_FLAG, I2C_EVENT_CHECK_NONE, I2C_TIMEOUT);
+
+          /* clear stop flag */
+      	i2c_flag_clear(state->handle.i2cx, I2C_STOPF_FLAG);
+        }
     }
 
     if (status != I2C_OK)
@@ -179,11 +187,28 @@ bool i2cRead(I2CDevice device, uint8_t addr_, uint8_t reg_, uint8_t len, uint8_t
     if (reg_ == 0xFF && allowRawAccess) {
         //status = HAL_I2C_Master_Receive(&state->handle, addr_ << 1,buf, len, I2C_DEFAULT_TIMEOUT);
         status = i2c_master_receive(&state->handle, addr_ << 1,buf, len, I2C_DEFAULT_TIMEOUT);
+        if(status !=  I2C_OK)
+        {
+          /* wait for the stop flag to be set  */
+          i2c_wait_flag(&state->handle, I2C_STOPF_FLAG, I2C_EVENT_CHECK_NONE, I2C_TIMEOUT);
+
+          /* clear stop flag */
+      	i2c_flag_clear(state->handle.i2cx, I2C_STOPF_FLAG);
+        }
 
     }
     else {
         //status = HAL_I2C_Mem_Read(&state->handle, addr_ << 1, reg_, I2C_MEMADD_SIZE_8BIT,buf, len, I2C_DEFAULT_TIMEOUT);
-        status = i2c_memory_read(&state->handle, I2C_MEM_ADDR_WIDIH_8,addr_ << 1, reg_, buf, len, I2C_DEFAULT_TIMEOUT);
+        status = i2c_memory_read_int(&state->handle, I2C_MEM_ADDR_WIDIH_8,addr_ << 1, reg_, buf, len, I2C_DEFAULT_TIMEOUT);
+        if(status !=  I2C_OK)
+        {
+          /* wait for the stop flag to be set  */
+          i2c_wait_flag(&state->handle, I2C_STOPF_FLAG, I2C_EVENT_CHECK_NONE, I2C_TIMEOUT);
+
+          /* clear stop flag */
+      	i2c_flag_clear(state->handle.i2cx, I2C_STOPF_FLAG);
+        }
+        
     }
 
     if (status != I2C_OK)

@@ -80,7 +80,7 @@ static bool flashDeviceInit(void)
 {
     bool detected = false;
 
-    for (uint32_t idx = 0; idx <= ARRAYLEN(flashDrivers); idx++)
+    for (uint32_t idx = 0; idx < ARRAYLEN(flashDrivers); idx++)// idx 应该是0、1 ，不应该为2 <= 导致越界
     {
         detected = flashDrivers[idx].init(0);
         if (detected)

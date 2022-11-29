@@ -288,7 +288,7 @@ void spiSetSpeed(spi_type *instance, SPIClockSpeed_e speed)
     // todo set speed waring
     uint16_t tempRegister = instance->ctrl1;
     tempRegister &= BR_CLEAR_MASK;
-    tempRegister |= spiHardwareMap[device].divisorMap[speed];
+    tempRegister |= (spiHardwareMap[device].divisorMap[speed] << 3);
     //instance->CR1 = tempRegister;
     instance->ctrl1 = tempRegister;
 

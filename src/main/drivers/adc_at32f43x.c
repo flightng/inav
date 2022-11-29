@@ -100,34 +100,38 @@ static void adcInstanceInit(ADCDevice adcDevice)
     dma_init_struct.memory_base_addr = (uint32_t)adcValues[adcDevice];
     dma_init_struct.memory_data_width = DMA_MEMORY_DATA_WIDTH_HALFWORD;
     dma_init_struct.peripheral_data_width = DMA_PERIPHERAL_DATA_WIDTH_HALFWORD;  
-    dma_init_struct.priority = DMA_PRIORITY_HIGH;
+    dma_init_struct.priority = DMA_PRIORITY_MEDIUM;
     dma_init(dmadac->ref, &dma_init_struct);
     //开启中断
     dma_interrupt_enable(dmadac->ref, DMA_FDT_INT, TRUE);
     //设置DMA请求弹性映射，初始化时指定DMA2_CHANNEL1
     dmaMuxEnable(dmadac, dmadac->dmaMuxref);// TODO 弹性设置
     dma_channel_enable(dmadac->ref,TRUE);
-   
+   //init adc common 
+    adc_reset();
     adc_common_config_type adc_common_struct;
     adc_common_default_para_init(&adc_common_struct);
     adc_common_struct.combine_mode = ADC_INDEPENDENT_MODE;
-    adc_common_struct.div = ADC_HCLK_DIV_8;
+    adc_common_struct.div = ADC_HCLK_DIV_4;
     adc_common_struct.common_dma_mode = ADC_COMMON_DMAMODE_DISABLE;
     adc_common_struct.sampling_interval = ADC_SAMPLING_INTERVAL_5CYCLES;
-    adc_common_struct.tempervintrv_state = FALSE;
+    adc_common_struct.tempervintrv_state = TRUE;
     adc_common_struct.common_dma_request_repeat_state = FALSE;
-    adc_common_struct.vbat_state = FALSE;
+    adc_common_struct.vbat_state = TRUE;
     adc_common_config(&adc_common_struct);
 
     RCC_ClockCmd(adc->rccADC, ENABLE);
     adc_base_config_type adc_base_struct;
     adc_base_default_para_init(&adc_base_struct);
     adc_base_struct.sequence_mode = TRUE;
-    adc_base_struct.repeat_mode = FALSE;
+    adc_base_struct.repeat_mode = TRUE;
     adc_base_struct.data_align = ADC_RIGHT_ALIGNMENT;
     adc_base_struct.ordinary_channel_length = 3; 
     adc_base_config(adc->ADCx, &adc_base_struct);
     adc_resolution_set(adc->ADCx, ADC_RESOLUTION_12B);
+
+    //TODO:config adc1  voltage
+
 
     uint8_t rank = 1;
     for (int i = ADC_CHN_1; i < ADC_CHN_COUNT; i++) {
@@ -144,6 +148,8 @@ static void adcInstanceInit(ADCDevice adcDevice)
 
     //enable over flow interupt 
     adc_interrupt_enable(adc->ADCx, ADC_OCCO_INT, TRUE);
+
+    adc_enable(adc->ADCx,TRUE);
     
     // 校准ADC
     while(adc_flag_get(adc->ADCx, ADC_RDY_FLAG) == RESET);

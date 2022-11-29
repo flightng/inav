@@ -271,6 +271,7 @@ void TxTimerConfig(void){
 	       + ClockDivision = 0
 	       + Counter direction = Up
 	  */
+  crm_periph_clock_enable(CRM_TMR20_PERIPH_CLOCK, TRUE);
 	//timer, period, perscaler
 	tmr_base_init(usbTxTmr,(CDC_POLLING_INTERVAL - 1),((system_core_clock)/1000 - 1));
 	//TMR_CLOCK_DIV1 = 0X00 NO DIV

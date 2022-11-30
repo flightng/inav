@@ -1,9 +1,9 @@
-set(AT32_USBCORE_DIR "${MAIN_LIB_DIR}/main/AT32F43x/Middlewares/ST/AT32_USB_Device_Library/Core")
-set(AT32_USBCDC_DIR "${MAIN_LIB_DIR}/main/AT32F43x/Middlewares/ST/AT32_USB_Device_Library/Class/usbd_class/cdc")
-set(AT32_USBMSC_DIR "${MAIN_LIB_DIR}/main/AT32F43x/Middlewares/ST/AT32_USB_Device_Library/Class/usbd_class/msc")
+set(AT32_USBCORE_DIR "${MAIN_LIB_DIR}/main/AT32F43x/Middlewares/AT/AT32_USB_Device_Library/Core")
+set(AT32_USBCDC_DIR "${MAIN_LIB_DIR}/main/AT32F43x/Middlewares/AT/AT32_USB_Device_Library/Class/usbd_class/cdc")
+set(AT32_USBMSC_DIR "${MAIN_LIB_DIR}/main/AT32F43x/Middlewares/AT/AT32_USB_Device_Library/Class/usbd_class/msc")
 
 set(AT32F4_USB_INCLUDE_DIRS
-    "${AT32_USBCORE_DIR}/inc"
+    "${AT32_USBCORE_DIR}/Inc"
     "${AT32_USBCDC_DIR}"
     "${AT32_USBMSC_DIR}"
 )
@@ -14,7 +14,7 @@ set(AT32_USBCORE_SRC
     usbd_int.c
     usbd_sdr.c
 )
-list(TRANSFORM AT32_USBCORE_SRC PREPEND  "${AT32_USBCORE_DIR}/src/")
+list(TRANSFORM AT32_USBCORE_SRC PREPEND  "${AT32_USBCORE_DIR}/Src/")
 
 
 set(AT32_USBCDC_SRC

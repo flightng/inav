@@ -69,7 +69,7 @@ function(target_at32f43x)
 
         OPTIMIZATION -O2
 
-        OPENOCD_TARGET at32f43x
+        OPENOCD_TARGET at32f437xx
 
         ${ARGN}
     )

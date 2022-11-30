@@ -64,19 +64,19 @@
     static const uint32_t spiDivisorMapFast[] = {
         SPI_MCLK_DIV_256,    // SPI_CLOCK_INITIALIZATON      328.125 KBits/s
         SPI_MCLK_DIV_128,    // SPI_CLOCK_SLOW               656.25 KBits/s
-        SPI_MCLK_DIV_8,      // SPI_CLOCK_STANDARD           10.5 MBits/s
-        SPI_MCLK_DIV_4,      // SPI_CLOCK_FAST               21.0 MBits/s
-        SPI_MCLK_DIV_2       // SPI_CLOCK_ULTRAFAST          42.0 MBits/s
+        SPI_MCLK_DIV_16,      // SPI_CLOCK_STANDARD           10.5 MBits/s
+        SPI_MCLK_DIV_8,      // SPI_CLOCK_FAST               21.0 MBits/s
+        SPI_MCLK_DIV_4       // SPI_CLOCK_ULTRAFAST          42.0 MBits/s
     };
     #endif
 
     #if defined(USE_SPI_DEVICE_2) || defined(USE_SPI_DEVICE_3)
     static const uint32_t spiDivisorMapSlow[] = {
         SPI_MCLK_DIV_256,    // SPI_CLOCK_INITIALIZATON      164.062 KBits/s
-        SPI_MCLK_DIV_64,     // SPI_CLOCK_SLOW               656.25 KBits/s
-        SPI_MCLK_DIV_4,      // SPI_CLOCK_STANDARD           10.5 MBits/s
-        SPI_MCLK_DIV_2,      // SPI_CLOCK_FAST               21.0 MBits/s
-        SPI_MCLK_DIV_2       // SPI_CLOCK_ULTRAFAST          21.0 MBits/s
+        SPI_MCLK_DIV_128,     // SPI_CLOCK_SLOW               656.25 KBits/s
+        SPI_MCLK_DIV_16,      // SPI_CLOCK_STANDARD           10.5 MBits/s
+        SPI_MCLK_DIV_8,      // SPI_CLOCK_FAST               21.0 MBits/s
+        SPI_MCLK_DIV_8       // SPI_CLOCK_ULTRAFAST          21.0 MBits/s
     };
     #endif
 
@@ -288,7 +288,7 @@ void spiSetSpeed(spi_type *instance, SPIClockSpeed_e speed)
     // todo set speed waring
     uint16_t tempRegister = instance->ctrl1;
     tempRegister &= BR_CLEAR_MASK;
-    tempRegister |= spiHardwareMap[device].divisorMap[speed];
+    tempRegister |= (spiHardwareMap[device].divisorMap[speed] << 3);
     //instance->CR1 = tempRegister;
     instance->ctrl1 = tempRegister;
 

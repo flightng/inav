@@ -353,7 +353,7 @@ function(target_at32)
     )
 
     set_property(TARGET ${main_target_name} PROPERTY OPENOCD_TARGET ${args_OPENOCD_TARGET})
-    set_property(TARGET ${main_target_name} PROPERTY OPENOCD_DEFAULT_INTERFACE stlink)
+    set_property(TARGET ${main_target_name} PROPERTY OPENOCD_DEFAULT_INTERFACE atlink)
     set_property(TARGET ${main_target_name} PROPERTY SVD ${args_SVD})
 
     setup_firmware_target(${main_target_name} ${name} ${ARGN})

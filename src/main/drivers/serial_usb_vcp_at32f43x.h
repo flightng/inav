@@ -37,7 +37,7 @@ volatile uint32_t UserTxBufPtrIn = 0;/* Increment this pointer or roll it back t
 volatile uint32_t UserTxBufPtrOut = 0; /* Increment this pointer or roll it back to
                                  start address when data are sent over USB */
 tmr_type * usbTxTmr= TMR20;
-#define  CDC_POLLING_INTERVAL 5
+#define  CDC_POLLING_INTERVAL 50
 
 /*
     APP RX is the circular buffer for data that is transmitted from the APP (host)

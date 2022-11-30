@@ -133,6 +133,10 @@
 #define M25P16_SPI_BUS          BUS_SPI3
 #define M25P16_CS_PIN           SPI3_NSS_PIN
 
+#define USE_FLASH_W25N01G
+#define W25N01G_SPI_BUS         BUS_SPI3
+#define W25N01G_CS_PIN          SPI3_NSS_PIN
+
 // *************** UART *****************************
 #define USE_VCP
 #define USB_DETECT_PIN          PC14

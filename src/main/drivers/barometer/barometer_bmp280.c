@@ -70,12 +70,19 @@ static bool bmp280_start_up(baroDev_t * baro)
 {
     // start measurement
     // set oversampling + power mode (forced), and start sampling
+     if (busIsBusy(baro->busDev)) {
+            return false;
+        }
     busWrite(baro->busDev, BMP280_CTRL_MEAS_REG, BMP280_MODE);
     return true;
 }
 
 static bool bmp280_get_up(baroDev_t * baro)
 {
+     if (busIsBusy(baro->busDev)) {
+            return false;
+        }
+
     uint8_t data[BMP280_DATA_FRAME_SIZE];
 
     //error free measurements
@@ -84,7 +91,7 @@ static bool bmp280_get_up(baroDev_t * baro)
 
     //read data from sensor
     bool ack = busReadBuf(baro->busDev, BMP280_PRESSURE_MSB_REG, data, BMP280_DATA_FRAME_SIZE);
-
+    
     //check if pressure and temperature readings are valid, otherwise use previous measurements from the moment
     if (ack) {
         bmp280_up = (int32_t)((((uint32_t)(data[0])) << 12) | (((uint32_t)(data[1])) << 4) | ((uint32_t)data[2] >> 4));
@@ -187,7 +194,7 @@ bool bmp280Detect(baroDev_t *baro)
         busDeviceDeInit(baro->busDev);
         return false;
     }
-
+ 
     // read calibration
     busReadBuf(baro->busDev, BMP280_TEMPERATURE_CALIB_DIG_T1_LSB_REG, (uint8_t *)&bmp280_cal, 24);
 

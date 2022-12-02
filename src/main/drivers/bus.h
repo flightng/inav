@@ -287,6 +287,8 @@ bool i2cBusWriteRegister(const busDevice_t * dev, uint8_t reg, uint8_t data);
 bool i2cBusReadBuffer(const busDevice_t * dev, uint8_t reg, uint8_t * data, uint8_t length);
 bool i2cBusReadRegister(const busDevice_t * dev, uint8_t reg, uint8_t * data);
 
+bool i2cBusBusy(const busDevice_t *dev, bool *error);
+
 bool spiBusInitHost(const busDevice_t * dev);
 bool spiBusIsBusy(const busDevice_t * dev);
 void spiBusSetSpeed(const busDevice_t * dev, busSpeed_e speed);

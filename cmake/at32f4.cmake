@@ -80,7 +80,7 @@ endfunction()
 
 set(at32f43x_xMT7_COMPILE_DEFINITIONS
     AT32F437VMT7
-    MCU_FLASH_SIZE=4096
+    MCU_FLASH_SIZE=4032
 )
 
 function(target_at32f43x_xMT7 name)

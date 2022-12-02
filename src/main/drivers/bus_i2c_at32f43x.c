@@ -77,7 +77,8 @@ static volatile uint16_t i2cErrorCount = 0;
 // functions expect the timeout to be in ticks.
 // Since we're setting up the ticks a 1khz, each
 // tick equals 1ms.
-#define I2C_DEFAULT_TIMEOUT     (I2C_TIMEOUT / 1000)
+//#define I2C_DEFAULT_TIMEOUT     (I2C_TIMEOUT / 1000)
+#define I2C_DEFAULT_TIMEOUT     (0x8700)
 
 typedef struct {
     bool initialised;
@@ -140,24 +141,23 @@ bool i2cWriteBuffer(I2CDevice device, uint8_t addr_, uint8_t reg_, uint8_t len_,
 
     if (!state->initialised)
         return false;
-
-    //HAL_StatusTypeDef status;
+ 
     i2c_status_type status;
 
     if ((reg_ == 0xFF || len_ == 0) && allowRawAccess) {
-        //status = HAL_I2C_Master_Transmit(&state->handle, addr_ << 1, (uint8_t *)data, len_, I2C_DEFAULT_TIMEOUT);
-        status = i2c_master_transmit(&state->handle, addr_ << 1, (uint8_t *)data, len_, I2C_DEFAULT_TIMEOUT);
+        status = i2c_master_transmit(&state->handle, addr_ << 1, data, len_, I2C_DEFAULT_TIMEOUT);
     }
     else {
-        //status = HAL_I2C_Mem_Write(&state->handle, addr_ << 1, reg_, I2C_MEMADD_SIZE_8BIT, (uint8_t *)data, len_, I2C_DEFAULT_TIMEOUT);
-        status = i2c_memory_write_int(&state->handle,I2C_MEM_ADDR_WIDIH_8, addr_ << 1, reg_,  (uint8_t *)data, len_, I2C_DEFAULT_TIMEOUT);
+        status = i2c_memory_write(&state->handle,I2C_MEM_ADDR_WIDIH_8, addr_ << 1, reg_,  data, len_, I2C_DEFAULT_TIMEOUT);
+        //status = i2c_memory_write_int(&state->handle,I2C_MEM_ADDR_WIDIH_8, addr_ << 1, reg_,  data, len_, I2C_DEFAULT_TIMEOUT);
+        
         if(status !=  I2C_OK)
         {
           /* wait for the stop flag to be set  */
-          i2c_wait_flag(&state->handle, I2C_STOPF_FLAG, I2C_EVENT_CHECK_NONE, I2C_TIMEOUT);
+          i2c_wait_flag(&state->handle, I2C_STOPF_FLAG, I2C_EVENT_CHECK_NONE, I2C_DEFAULT_TIMEOUT);
 
           /* clear stop flag */
-      	i2c_flag_clear(state->handle.i2cx, I2C_STOPF_FLAG);
+      	  i2c_flag_clear(state->handle.i2cx, I2C_STOPF_FLAG);
         }
     }
 
@@ -184,29 +184,28 @@ bool i2cRead(I2CDevice device, uint8_t addr_, uint8_t reg_, uint8_t len, uint8_t
 
     //HAL_StatusTypeDef status;
     i2c_status_type status;
-    if (reg_ == 0xFF && allowRawAccess) {
-        //status = HAL_I2C_Master_Receive(&state->handle, addr_ << 1,buf, len, I2C_DEFAULT_TIMEOUT);
+    if (reg_ == 0xFF && allowRawAccess) { 
         status = i2c_master_receive(&state->handle, addr_ << 1,buf, len, I2C_DEFAULT_TIMEOUT);
         if(status !=  I2C_OK)
         {
           /* wait for the stop flag to be set  */
-          i2c_wait_flag(&state->handle, I2C_STOPF_FLAG, I2C_EVENT_CHECK_NONE, I2C_TIMEOUT);
+          i2c_wait_flag(&state->handle, I2C_STOPF_FLAG, I2C_EVENT_CHECK_NONE, I2C_DEFAULT_TIMEOUT);
 
           /* clear stop flag */
-      	i2c_flag_clear(state->handle.i2cx, I2C_STOPF_FLAG);
+      	  i2c_flag_clear(state->handle.i2cx, I2C_STOPF_FLAG);
         }
 
     }
-    else {
-        //status = HAL_I2C_Mem_Read(&state->handle, addr_ << 1, reg_, I2C_MEMADD_SIZE_8BIT,buf, len, I2C_DEFAULT_TIMEOUT);
-        status = i2c_memory_read_int(&state->handle, I2C_MEM_ADDR_WIDIH_8,addr_ << 1, reg_, buf, len, I2C_DEFAULT_TIMEOUT);
+    else { 
+        status = i2c_memory_read(&state->handle, I2C_MEM_ADDR_WIDIH_8,addr_ << 1, reg_, buf, len, I2C_DEFAULT_TIMEOUT);
+
         if(status !=  I2C_OK)
         {
           /* wait for the stop flag to be set  */
-          i2c_wait_flag(&state->handle, I2C_STOPF_FLAG, I2C_EVENT_CHECK_NONE, I2C_TIMEOUT);
+          i2c_wait_flag(&state->handle, I2C_STOPF_FLAG, I2C_EVENT_CHECK_NONE, I2C_DEFAULT_TIMEOUT);
 
           /* clear stop flag */
-      	i2c_flag_clear(state->handle.i2cx, I2C_STOPF_FLAG);
+      	  i2c_flag_clear(state->handle.i2cx, I2C_STOPF_FLAG);
         }
         
     }
@@ -221,22 +220,22 @@ bool i2cRead(I2CDevice device, uint8_t addr_, uint8_t reg_, uint8_t len, uint8_t
  * Compute SCLDEL, SDADEL, SCLH and SCLL for TIMINGR register according to reference manuals.
  */
 static void i2cClockComputeRaw(uint32_t pclkFreq, int i2cFreqKhz, int presc, int dfcoeff,
-                       uint8_t *scldel, uint8_t *sdadel, uint16_t *sclh, uint16_t *scll)
+                            uint8_t *scldel, uint8_t *sdadel, uint16_t *sclh, uint16_t *scll)
 {
     // Values from I2C-SMBus specification
-    uint16_t trmax;      // Raise time (max)
+    uint16_t trmax;      // Rise time (max)
     uint16_t tfmax;      // Fall time (max)
-    uint8_t  tsuDATmin;  // SDA setup time (min)
-    uint8_t  thdDATmin;  // SDA hold time (min)
+    uint8_t tsuDATmin;   // SDA setup time (min)
+    uint8_t thdDATmin;   // SDA hold time (min)
+    uint16_t tHIGHmin;   // High period of SCL clock (min)
+    uint16_t tLOWmin;    // Low period of SCL clock (min)
 
     // Silicon specific values, from datasheet
-    uint8_t  tAFmin;     // Analog filter delay (min)
-    //uint8_t  tAFmax;     // Analog filter delay (max)
+    uint8_t tAFmin = 50; // Analog filter delay (min)
 
     // Actual (estimated) values
-    uint16_t tr = 100;   // Raise time
-    uint16_t tf = 100;   // Fall time
-    uint8_t  tAF = 70;   // Analog filter delay
+    uint8_t tr = 100;   // Rise time
+    uint8_t tf = 10;    // Fall time
 
     if (i2cFreqKhz > 400) {
         // Fm+ (Fast mode plus)
@@ -244,16 +243,17 @@ static void i2cClockComputeRaw(uint32_t pclkFreq, int i2cFreqKhz, int presc, int
         tfmax = 120;
         tsuDATmin = 50;
         thdDATmin = 0;
+        tHIGHmin = 260;
+        tLOWmin = 500;
     } else {
         // Fm (Fast mode)
         trmax = 300;
         tfmax = 300;
         tsuDATmin = 100;
         thdDATmin = 0;
+        tHIGHmin = 600;
+        tLOWmin = 1300;
     }
-
-    tAFmin = 50;
-    //tAFmax = 90;  // Unused
 
     // Convert pclkFreq into nsec
     float tI2cclk = 1000000000.0f / pclkFreq;
@@ -261,26 +261,28 @@ static void i2cClockComputeRaw(uint32_t pclkFreq, int i2cFreqKhz, int presc, int
     // Convert target i2cFreq into cycle time (nsec)
     float tSCL = 1000000.0f / i2cFreqKhz;
 
-    uint32_t SCLDELmin = (trmax + tsuDATmin)/((presc + 1) * tI2cclk) - 1;
-
+    uint32_t SCLDELmin = (trmax + tsuDATmin) / ((presc + 1) * tI2cclk) - 1;
     uint32_t SDADELmin = (tfmax + thdDATmin - tAFmin - ((dfcoeff + 3) * tI2cclk)) / ((presc + 1) * tI2cclk);
 
-    float tsync1 = tf + tAF + dfcoeff * tI2cclk + 3 * tI2cclk;
-    float tsync2 = tr + tAF + dfcoeff * tI2cclk + 3 * tI2cclk;
+    float tsync1 = tf + tAFmin + dfcoeff * tI2cclk + 2 * tI2cclk;
+    float tsync2 = tr + tAFmin + dfcoeff * tI2cclk + 2 * tI2cclk;
 
-    float tSCLHL = tSCL - tsync1 - tsync2;
-    float SCLHL = tSCLHL / ((presc + 1) * tI2cclk) - 1;
+    float tSCLH = tHIGHmin * tSCL / (tHIGHmin + tLOWmin) - tsync2;
+    float tSCLL = tSCL - tSCLH - tsync1 - tsync2;
 
-    uint32_t SCLH = SCLHL / 4.75;  // STM32CubeMX seems to use a value like this
-    uint32_t SCLL = (uint32_t)(SCLHL + 0.5f) - SCLH;
+    uint32_t SCLH = tSCLH / ((presc + 1) * tI2cclk) - 1;
+    uint32_t SCLL = tSCLL / ((presc + 1) * tI2cclk) - 1;
+
+    while (tsync1 + tsync2 + ((SCLH + 1) + (SCLL + 1)) * ((presc + 1) * tI2cclk) < tSCL) {
+        SCLH++;
+    }
 
     *scldel = SCLDELmin;
     *sdadel = SDADELmin;
-    *sclh = SCLH - 1;
-    *scll = SCLL - 1;
+    *sclh = SCLH;
+    *scll = SCLL;
 }
 
-//todo i2c clock
 static uint32_t i2cClockTIMINGR(uint32_t pclkFreq, int i2cFreqKhz, int dfcoeff)
 {
 #define TIMINGR(presc, scldel, sdadel, sclh, scll) \
@@ -331,62 +333,70 @@ void i2cInit(I2CDevice device)
 
     // Init I2C peripheral
     pHandle->i2cx = hardware->dev;
-
+    i2c_reset(pHandle->i2cx);
     // Compute TIMINGR value based on peripheral clock for this device instance
-    //uint32_t i2cPclk; //未启用
-//todo 未使用计算算法，目前先写死
-#if defined(AT32F43x)  
-    //i2cPclk = HAL_RCC_GetPCLK1Freq(); 
+    uint32_t i2cPclk; 
+ 
+    #if defined(AT32F43x)  
+        crm_clocks_freq_type clocks_struct;
+        crm_clocks_freq_get(&clocks_struct);
+        i2cPclk = clocks_struct.apb1_freq;   
 
-    //crm_clocks_freq_type clocks_struct;
-    //crm_clocks_freq_get(&clocks_struct);
-    // i2cPclk = clocks_struct.apb1_freq;   
-    //i2c_init(pHandle->i2cx, 15, i2cClockTIMINGR(i2cPclk, 400, 0));
+    #else
+        #error Unknown MCU type
+    #endif
+   
+ 
+    // switch (hardware->speed) {
+    //     case I2C_SPEED_400KHZ:
+    //     default:
+    //         i2c_init(pHandle->i2cx, 15, 0x10F03863);    // 400kHz, Rise 100ns, Fall 10ns  0x10C03863
+    //         break;
+ 
+    //     case I2C_SPEED_800KHZ:  
+    //         i2c_init(pHandle->i2cx, 15, 0x00E03259);    // 800khz, Rise 40, Fall 4
+    //         break;
 
-#else
-    #error Unknown MCU type
-#endif
-   i2c_reset(pHandle->i2cx);
-    switch (hardware->speed) {
+    //     case I2C_SPEED_100KHZ:
+    //         i2c_init(pHandle->i2cx, 15, 0x30E0AEAE);     // 100kHz, Rise 100ns, Fall 10ns 0x30607EE0 0x30607DDE
+    //         break;
+            
+    //     case I2C_SPEED_200KHZ:
+    //         i2c_init(pHandle->i2cx, 15, 0x10F078D6);      // 200kHz, Rise 100ns, Fall 10ns  0x10C078D6
+    //         break;
+    // }
+ 
+  
+ switch (hardware->speed) {
         case I2C_SPEED_400KHZ:
         default:
-            i2c_init(pHandle->i2cx, 15, 0x10F03863);    // 400kHz, Rise 100ns, Fall 10ns  0x10C03863
+             i2c_init(pHandle->i2cx, 0x0f, i2cClockTIMINGR(i2cPclk, 400, 0));
             break;
- 
-        case I2C_SPEED_800KHZ:  
-            i2c_init(pHandle->i2cx, 15, 0x00E03259);    // 800khz, Rise 40, Fall 4
+
+        case I2C_SPEED_800KHZ:
+             i2c_init(pHandle->i2cx, 0x0f, i2cClockTIMINGR(i2cPclk, 800, 0));
             break;
 
         case I2C_SPEED_100KHZ:
-            i2c_init(pHandle->i2cx, 15, 0x30E0AEAE);     // 100kHz, Rise 100ns, Fall 10ns 0x30607EE0 0x30607DDE
+            i2c_init(pHandle->i2cx, 0x0f, i2cClockTIMINGR(i2cPclk, 100, 0));
             break;
-            
+
         case I2C_SPEED_200KHZ:
-            i2c_init(pHandle->i2cx, 15, 0x10F078D6);      // 200kHz, Rise 100ns, Fall 10ns  0x10C078D6
+            i2c_init(pHandle->i2cx, 0x0f, i2cClockTIMINGR(i2cPclk, 200, 0));
             break;
     }
- 
-    i2c_own_address1_set(pHandle->i2cx, I2C_ADDRESS_MODE_7BIT, 0x0);
-    i2c_own_address2_enable(pHandle->i2cx, false); // 双地址模式
-    i2c_own_address2_set(pHandle->i2cx, I2C_ADDRESS_MODE_7BIT, 0x0);
-    i2c_general_call_enable(pHandle->i2cx, false); // 广播使能
-    i2c_clock_stretch_enable(pHandle->i2cx, true); // 时钟延展
-    
-    i2c_enable(pHandle->i2cx, TRUE);
-    //i2c_config(pHandle);  
-   
-    // pHandle->Init.OwnAddress1     = 0x0;
-    // pHandle->Init.AddressingMode  = I2C_ADDRESSINGMODE_7BIT;
-    // pHandle->Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-    // pHandle->Init.OwnAddress2     = 0x0;
-    // pHandle->Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-    // pHandle->Init.NoStretchMode   = I2C_NOSTRETCH_DISABLE;
-    // HAL_I2C_Init(pHandle);
-    // HAL_I2CEx_ConfigAnalogFilter(pHandle, I2C_ANALOGFILTER_ENABLE);
 
+    i2c_own_address1_set(pHandle->i2cx, I2C_ADDRESS_MODE_7BIT, 0x0);
+    //i2c_own_address2_enable(pHandle->i2cx, false); // 双地址模式
+    //i2c_own_address2_set(pHandle->i2cx, I2C_ADDRESS_MODE_7BIT, 0x0);
+    //i2c_general_call_enable(pHandle->i2cx, false); // 广播使能
+    //i2c_clock_stretch_enable(pHandle->i2cx, true); // 时钟延展
+    
     nvic_irq_enable(hardware->er_irq,NVIC_PRIO_I2C_ER, 0);
     nvic_irq_enable(hardware->ev_irq, NVIC_PRIO_I2C_EV,0);
 
+    i2c_enable(pHandle->i2cx, TRUE);
+     
     state->initialised = true;
 }
 
@@ -431,6 +441,29 @@ static void i2cUnstick(IO_t scl, IO_t sda)
     IOHi(scl); // Set bus scl high
     delayMicroseconds(5);
     IOHi(sda); // Set bus sda high
+}
+
+bool i2cBusy(I2CDevice device, bool *error)
+{
+    if (device == I2CINVALID)
+        return true;
+
+    i2cState_t * state = &(i2cState[device]);
+    
+    // if (error) {
+    //     *error = state->handle.error_code;
+    // }
+    
+    if(state->handle.error_code ==I2C_OK){
+        
+    	   if (i2c_flag_get(state->handle.i2cx, I2C_BUSYF_FLAG) == SET)
+    	   {
+    		   return true;
+    	   }
+    	   return false;
+    }
+
+   return true;
 }
 
 #endif

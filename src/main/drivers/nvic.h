@@ -14,6 +14,8 @@
 #define NVIC_PRIO_SDIO                      3
 #define NVIC_PRIO_USB                       5
 #define NVIC_PRIO_SERIALUART                5
+#define NVIC_PRIO_VCP                       7
+
 
 #if defined(AT32F43x)  
     #ifdef USE_HAL_DRIVER

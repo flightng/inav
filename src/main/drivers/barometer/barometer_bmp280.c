@@ -182,12 +182,13 @@ static bool deviceDetect(busDevice_t * busDev)
 }
 
 bool bmp280Detect(baroDev_t *baro)
-{
+{  
+    delay(20);
     baro->busDev = busDeviceInit(BUSTYPE_ANY, DEVHW_BMP280, 0, OWNER_BARO);
     if (baro->busDev == NULL) {
         return false;
     }
-
+    UNUSED(baro->busDev);
     busSetSpeed(baro->busDev, BUS_SPEED_STANDARD);
 
     if (!deviceDetect(baro->busDev)) {

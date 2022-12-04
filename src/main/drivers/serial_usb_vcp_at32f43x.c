@@ -233,7 +233,7 @@ uint32_t CDC_Send_FreeBytes(void)
         but without the impact of the condition check.
     */
     uint32_t freeBytes;
-    ATOMIC_BLOCK(NVIC_PRIO_USB) {
+    ATOMIC_BLOCK(NVIC_PRIO_VCP) {
         freeBytes = ((UserTxBufPtrOut - UserTxBufPtrIn) + (-((int)(UserTxBufPtrOut <= UserTxBufPtrIn)) & APP_TX_DATA_SIZE)) - 1;
     }
 
@@ -256,7 +256,7 @@ uint32_t CDC_Send_DATA(const uint8_t *ptrBuffer, uint32_t sendLength)
             delay(1);
         }
 
-        ATOMIC_BLOCK(NVIC_PRIO_USB) {
+        ATOMIC_BLOCK(NVIC_PRIO_VCP) {
             UserTxBuffer[UserTxBufPtrIn] = ptrBuffer[i];
             UserTxBufPtrIn = (UserTxBufPtrIn + 1) % APP_TX_DATA_SIZE;
         }

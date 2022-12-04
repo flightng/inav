@@ -62,21 +62,21 @@
 #if defined(AT32F43x)
     #if defined(USE_SPI_DEVICE_1)
     static const uint32_t spiDivisorMapFast[] = {
-        SPI_MCLK_DIV_256,    // SPI_CLOCK_INITIALIZATON      328.125 KBits/s
-        SPI_MCLK_DIV_128,    // SPI_CLOCK_SLOW               656.25 KBits/s
+        SPI_MCLK_DIV_256,     // SPI_CLOCK_INITIALIZATON      328.125 KBits/s
+        SPI_MCLK_DIV_128,     // SPI_CLOCK_SLOW               656.25 KBits/s
         SPI_MCLK_DIV_16,      // SPI_CLOCK_STANDARD           10.5 MBits/s
-        SPI_MCLK_DIV_8,      // SPI_CLOCK_FAST               21.0 MBits/s
-        SPI_MCLK_DIV_4       // SPI_CLOCK_ULTRAFAST          42.0 MBits/s
+        SPI_MCLK_DIV_8,       // SPI_CLOCK_FAST               21.0 MBits/s
+        SPI_MCLK_DIV_4        // SPI_CLOCK_ULTRAFAST          42.0 MBits/s
     };
     #endif
 
     #if defined(USE_SPI_DEVICE_2) || defined(USE_SPI_DEVICE_3)
     static const uint32_t spiDivisorMapSlow[] = {
-        SPI_MCLK_DIV_256,    // SPI_CLOCK_INITIALIZATON      164.062 KBits/s
+        SPI_MCLK_DIV_256,     // SPI_CLOCK_INITIALIZATON      164.062 KBits/s
         SPI_MCLK_DIV_128,     // SPI_CLOCK_SLOW               656.25 KBits/s
         SPI_MCLK_DIV_16,      // SPI_CLOCK_STANDARD           10.5 MBits/s
-        SPI_MCLK_DIV_8,      // SPI_CLOCK_FAST               21.0 MBits/s
-        SPI_MCLK_DIV_8       // SPI_CLOCK_ULTRAFAST          21.0 MBits/s
+        SPI_MCLK_DIV_8,       // SPI_CLOCK_FAST               21.0 MBits/s
+        SPI_MCLK_DIV_8        // SPI_CLOCK_ULTRAFAST          21.0 MBits/s
     };
     #endif
 
@@ -127,51 +127,21 @@ bool spiInitDevice(SPIDevice device, bool leadingEdge)
     if (spi->initDone) {
         return true;
     }
-
     // Enable SPI clock
     RCC_ClockCmd(spi->rcc, ENABLE);
-    RCC_ResetCmd(spi->rcc, DISABLE);
+    RCC_ResetCmd(spi->rcc, ENABLE);
 
     IOInit(IOGetByTag(spi->sck),  OWNER_SPI, RESOURCE_SPI_SCK,  device + 1);
     IOInit(IOGetByTag(spi->miso), OWNER_SPI, RESOURCE_SPI_MISO, device + 1);
     IOInit(IOGetByTag(spi->mosi), OWNER_SPI, RESOURCE_SPI_MOSI, device + 1);
 
-    if (leadingEdge) {
-        IOConfigGPIOAF(IOGetByTag(spi->sck),  SPI_IO_AF_SCK_CFG, spi->af);
-        IOConfigGPIOAF(IOGetByTag(spi->miso), SPI_IO_AF_MISO_CFG, spi->af);
-        IOConfigGPIOAF(IOGetByTag(spi->mosi), SPI_IO_AF_CFG, spi->af);
-    } else {
-        IOConfigGPIOAF(IOGetByTag(spi->sck),  SPI_IO_AF_CFG, spi->af);
-        IOConfigGPIOAF(IOGetByTag(spi->miso), SPI_IO_AF_CFG, spi->af);
-        IOConfigGPIOAF(IOGetByTag(spi->mosi), SPI_IO_AF_CFG, spi->af);
-    }
+    IOConfigGPIOAF(IOGetByTag(spi->sck),  SPI_IO_AF_SCK_CFG, spi->af);
+    IOConfigGPIOAF(IOGetByTag(spi->miso), SPI_IO_AF_MISO_CFG, spi->af);
+    IOConfigGPIOAF(IOGetByTag(spi->mosi), SPI_IO_AF_CFG, spi->af);
+
     if (spi->nss) {
         IOConfigGPIOAF(IOGetByTag(spi->nss), SPI_IO_CS_CFG, spi->af);
     }
-
-    
-
-    // Init SPI hardware
-    //SPI_I2S_DeInit(spi->dev);
-
-    //SPI_InitTypeDef spiInit;
-    //spiInit.SPI_Mode = SPI_Mode_Master;
-    //spiInit.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
-    //spiInit.SPI_DataSize = SPI_DataSize_8b;
-    //spiInit.SPI_NSS = SPI_NSS_Soft;
-    //spiInit.SPI_FirstBit = SPI_FirstBit_MSB;
-    //spiInit.SPI_CRCPolynomial = 7;
-    //spiInit.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8;
-
-    // if (leadingEdge) {
-    //     // SPI_MODE0
-    //     spiInit.SPI_CPOL = SPI_CPOL_Low;
-    //     spiInit.SPI_CPHA = SPI_CPHA_1Edge;
-    // } else {
-    //     // SPI_MODE3
-    //     spiInit.SPI_CPOL = SPI_CPOL_High;
-    //     spiInit.SPI_CPHA = SPI_CPHA_2Edge;
-    // }
 
     spi_i2s_reset(spi->dev);
     spi_init_type spi_init_struct;
@@ -183,9 +153,8 @@ bool spiInitDevice(SPIDevice device, bool leadingEdge)
     spi_init_struct.frame_bit_num = SPI_FRAME_8BIT;
     spi_init_struct.cs_mode_selection = SPI_CS_SOFTWARE_MODE;
 
-    spi_init_struct.clock_polarity = SPI_CLOCK_POLARITY_LOW;
+    spi_init_struct.clock_polarity = SPI_CLOCK_POLARITY_HIGH;
     spi_init_struct.clock_phase = SPI_CLOCK_PHASE_2EDGE;
-    spi_crc_polynomial_set (spi->dev, 0x07);
 
     if (leadingEdge) {
         // SPI_MODE0
@@ -197,8 +166,9 @@ bool spiInitDevice(SPIDevice device, bool leadingEdge)
        spi_init_struct.clock_phase = SPI_CLOCK_PHASE_2EDGE;
 
     }
-    spi_crc_enable (spi->dev, TRUE); // 开启校验
     spi_init(spi->dev, &spi_init_struct);
+    spi_crc_polynomial_set (spi->dev, 0x07);
+    spi_crc_enable (spi->dev, TRUE); // 开启校验
     spi_enable (spi->dev, TRUE);
 
     if (spi->nss) {
@@ -282,19 +252,18 @@ void spiSetSpeed(spi_type *instance, SPIClockSpeed_e speed)
     if (device == SPIINVALID) {
         return;
     }
+ 
+    spi_enable (instance, FALSE); 
 
-    //SPI_Cmd(instance, DISABLE);
-    spi_enable (instance, FALSE);
-    // todo set speed waring
+    // #define BR_BITS ((BIT(5) | BIT(4) | BIT(3)))
+    // const uint16_t tempRegister = (instance->ctrl1 & ~BR_BITS);
+    // instance->ctrl1 = tempRegister | (spiHardwareMap[device].divisorMap[speed] << 3);
+    // #undef BR_BITS
+
     uint16_t tempRegister = instance->ctrl1;
     tempRegister &= BR_CLEAR_MASK;
     tempRegister |= (spiHardwareMap[device].divisorMap[speed] << 3);
-    //instance->CR1 = tempRegister;
     instance->ctrl1 = tempRegister;
-
-    // spi_x->ctrl2_bit.mdiv3en = FALSE;
-    // spi_x->ctrl2_bit.mdiv_h = FALSE;
-    // spi_x->ctrl1_bit.mdiv_l = spi_init_struct->mclk_freq_division;
     
     spi_enable (instance, TRUE);
 }

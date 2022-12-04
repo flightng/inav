@@ -27,6 +27,7 @@
 #include "common/utils.h"
 #include "common/maths.h"
 #include "common/crc.h"
+#include "common/log.h"
 
 #include "drivers/system.h"
 #include "drivers/serial.h"
@@ -266,6 +267,8 @@ static uint8_t mspSerialChecksumBuf(uint8_t checksum, const uint8_t *data, int l
 }
 
 #define JUMBO_FRAME_SIZE_LIMIT 255
+static uint8_t tmpBuf[JUMBO_FRAME_SIZE_LIMIT];
+static uint32_t sendcount = 0;
 static int mspSerialSendFrame(mspPort_t *msp, const uint8_t * hdr, int hdrLen, const uint8_t * data, int dataLen, const uint8_t * crc, int crcLen)
 {
     // MSP port might be turned into a CLI port, which will make
@@ -286,14 +289,32 @@ static int mspSerialSendFrame(mspPort_t *msp, const uint8_t * hdr, int hdrLen, c
     const int totalFrameLength = hdrLen + dataLen + crcLen;
     if (!isSerialTransmitBufferEmpty(port) && ((int)serialTxBytesFree(port) < totalFrameLength))
         return 0;
-
-    // Transmit frame
+    
+    // 合并一起发送 测试 用
+    if(totalFrameLength > JUMBO_FRAME_SIZE_LIMIT)
+    { 
+        return 0;
+    } 
+     sendcount ++;
+     
+    for (uint32_t i = 0; i < hdrLen; i++) {
+    tmpBuf[i] =  hdr[i];
+    }
+    for (uint32_t i = 0; i < dataLen; i++) {
+    tmpBuf[hdrLen+i] =  data[i];
+    }
+    for (uint32_t i = 0; i < crcLen; i++) {
+    tmpBuf[hdrLen+dataLen+i] =  crc[i];
+    }
+     
     serialBeginWrite(port);
-    serialWriteBuf(port, hdr, hdrLen);
-    serialWriteBuf(port, data, dataLen);
-    serialWriteBuf(port, crc, crcLen);
+    serialWriteBuf(port, tmpBuf, totalFrameLength);
+ 
+    // serialWriteBuf(port, hdr, hdrLen);
+    // serialWriteBuf(port, data, dataLen);
+    // serialWriteBuf(port, crc, crcLen);
     serialEndWrite(port);
-
+    
     return totalFrameLength;
 }
 

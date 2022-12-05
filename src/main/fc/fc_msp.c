@@ -410,6 +410,8 @@ static bool mspFcProcessOutCommand(uint16_t cmdMSP, sbuf_t *dst, mspPostProcessF
         sbufWriteU8(dst, getHwRangefinderStatus());
         sbufWriteU8(dst, getHwPitotmeterStatus());
         sbufWriteU8(dst, getHwOpticalFlowStatus());
+        sbufWriteU8(dst, HW_SENSOR_NONE);
+
         break;
 
     case MSP_ACTIVEBOXES:

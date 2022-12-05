@@ -289,14 +289,14 @@ static int mspSerialSendFrame(mspPort_t *msp, const uint8_t * hdr, int hdrLen, c
     const int totalFrameLength = hdrLen + dataLen + crcLen;
     if (!isSerialTransmitBufferEmpty(port) && ((int)serialTxBytesFree(port) < totalFrameLength))
         return 0;
-    
+    /*
     // 合并一起发送 测试 用
     if(totalFrameLength > JUMBO_FRAME_SIZE_LIMIT)
     { 
         return 0;
     } 
      sendcount ++;
-     
+
     for (uint32_t i = 0; i < hdrLen; i++) {
     tmpBuf[i] =  hdr[i];
     }
@@ -306,13 +306,13 @@ static int mspSerialSendFrame(mspPort_t *msp, const uint8_t * hdr, int hdrLen, c
     for (uint32_t i = 0; i < crcLen; i++) {
     tmpBuf[hdrLen+dataLen+i] =  crc[i];
     }
-     
+    */
     serialBeginWrite(port);
-    serialWriteBuf(port, tmpBuf, totalFrameLength);
+    //serialWriteBuf(port, tmpBuf, totalFrameLength);
  
-    // serialWriteBuf(port, hdr, hdrLen);
-    // serialWriteBuf(port, data, dataLen);
-    // serialWriteBuf(port, crc, crcLen);
+    serialWriteBuf(port, hdr, hdrLen);
+    serialWriteBuf(port, data, dataLen);
+    serialWriteBuf(port, crc, crcLen);
     serialEndWrite(port);
     
     return totalFrameLength;

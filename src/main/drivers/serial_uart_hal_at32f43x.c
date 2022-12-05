@@ -79,7 +79,7 @@ static void uartReconfigure(uartPort_t *uartPort)
     usart_init(uartPort->USARTx, baud_rate, data_bit, stop_bit);
 
     parity_type   = (uartPort->port.options & SERIAL_PARITY_EVEN) ? USART_PARITY_EVEN : USART_PARITY_NONE;
-    usart_parity_selection_config(uartPort->USARTx, USART_PARITY_EVEN);
+    usart_parity_selection_config(uartPort->USARTx, parity_type);
     usart_hardware_flow_control_set (uartPort->USARTx, USART_HARDWARE_FLOW_NONE);
 
     if (uartPort->port.mode & MODE_RX)

@@ -60,7 +60,7 @@ void impl_timerConfigBase(TCH_t * tch, uint16_t period, uint32_t hz)
 {
     tmr_type * tim = tch->timCtx->timDef->tim;
     tmr_base_init(tim, (period - 1) & 0xffff,  lrintf((float)timerGetBaseClock(tch) / hz + 0.01f) - 1);
-    tmr_div_value_set(tim, TMR_CLOCK_DIV1);
+    tmr_clock_source_div_set(tim, TMR_CLOCK_DIV1);
     tmr_cnt_dir_set(tim, TMR_COUNT_UP);  /* 向上计数（默认） */
 }
 
@@ -289,7 +289,7 @@ bool impl_timerPWMConfigChannelDMA(TCH_t * tch, void * dmaBuffer, uint8_t dmaBuf
     if (tch->dma == NULL) {
         return false;  
     }
-    tch->dma->dmaMuxref = tch->timHw->dmaMuxid;
+    // tch->dma->dmaMuxref = tch->timHw->dmaMuxid;
 
     // If DMA is already in use - abort
     if (tch->dma->owner != OWNER_FREE) {
@@ -370,7 +370,7 @@ void impl_timerPWMPrepareDMA(TCH_t * tch, uint32_t dmaBufferElementCount)
     if (tch->dma == NULL) {
         return false;  
     }
-    tch->dma->dmaMuxref = tch->timHw->dmaMuxid;
+    // tch->dma->dmaMuxref = tch->timHw->dmaMuxid;
 
     // Make sure we terminate any DMA transaction currently in progress
     // Clear the flag as well, so even if DMA transfer finishes while within ATOMIC_BLOCK
@@ -384,8 +384,8 @@ void impl_timerPWMPrepareDMA(TCH_t * tch, uint32_t dmaBufferElementCount)
     }
     //DMA_SetCurrDataCounter(tch->dma->ref, dmaBufferElementCount); 
     dma_data_number_set(tch->dma->ref, dmaBufferElementCount); 
-     //TODO 设置DMA请求弹性映射
-    dmaMuxEnable(tch->dma, tch->dma->dmaMuxref);
+     //TODO prepare 中不需要重新设置dmamux
+    // dmaMuxEnable(tch->dma, tch->dma->dmaMuxref);
     dma_channel_enable(tch->dma->ref,TRUE);
     tch->dmaState = TCH_DMA_READY;
 }

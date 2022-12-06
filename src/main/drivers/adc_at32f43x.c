@@ -83,7 +83,7 @@ static void adcInstanceInit(ADCDevice adcDevice)
     {
         return;
     }
-    dmadac->dmaMuxref = adc->dmaMuxid;
+    // dmadac->dmaMuxref = adc->dmaMuxid;//this cause an error
     // 开启时钟 adcDevice =0 、1、2、3
     dmaInit(dmadac, OWNER_ADC, adcDevice);
     // dma_channel_type
@@ -105,7 +105,7 @@ static void adcInstanceInit(ADCDevice adcDevice)
     //开启中断
     dma_interrupt_enable(dmadac->ref, DMA_FDT_INT, TRUE);
     //设置DMA请求弹性映射，初始化时指定DMA2_CHANNEL1
-    dmaMuxEnable(dmadac, dmadac->dmaMuxref);// TODO 弹性设置
+    dmaMuxEnable(dmadac, adc->dmaMuxid);// TODO 弹性设置
     dma_channel_enable(dmadac->ref,TRUE);
    //init adc common 
     adc_reset();

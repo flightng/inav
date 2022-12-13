@@ -95,3 +95,21 @@ function(target_at32f43x_xMT7 name)
         ${ARGN}
     )
 endfunction()
+
+set(at32f43x_xGT7_COMPILE_DEFINITIONS
+    AT32F435RGT7
+    MCU_FLASH_SIZE=1024
+)
+
+function(target_at32f43x_xGT7 name)
+    target_at32f43x(
+        NAME ${name}
+        STARTUP startup_at32f435_437.s
+        SOURCES ${AT32F4_STDPERIPH_SRC}
+        COMPILE_DEFINITIONS ${at32f43x_xGT7_COMPILE_DEFINITIONS}
+        LINKER_SCRIPT at32_flash_f43xG
+        #BOOTLOADER
+        SVD at32f43x_xGT7
+        ${ARGN}
+    )
+endfunction()

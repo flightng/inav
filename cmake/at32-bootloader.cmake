@@ -20,6 +20,9 @@ main_sources(BOOTLOADER_SOURCES
     drivers/system.c
     drivers/time.c
     drivers/timer.c
+    drivers/flash_m25p16.c
+    drivers/flash_w25n01g.c 
+    drivers/flash.c
 
     fc/firmware_update_common.c
     fc/firmware_update_common.h

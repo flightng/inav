@@ -223,6 +223,14 @@ SECTIONS
     __persistent_data_end__ = .;
   } >FASTRAM
 
+  .DMA_RAM (NOLOAD) :
+  { 
+    __dmaram_start__ = .;
+    *(.DMA_RAM)
+    . = ALIGN(32);
+    __dmaram_end__ = .;
+  } >FASTRAM
+
   /* User_heap_stack section, used to check that there is enough RAM left */
   _heap_stack_end = ORIGIN(STACKRAM) + LENGTH(STACKRAM) - _Hot_Reboot_Flags_Size;
   _heap_stack_begin = _heap_stack_end - _Min_Stack_Size  - _Min_Heap_Size;

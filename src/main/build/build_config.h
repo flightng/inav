@@ -51,10 +51,13 @@
 #define EXTENDED_FASTRAM
 #endif
 
-#ifdef STM32H7
+#if defined (STM32H7)
 #define DMA_RAM __attribute__ ((section(".DMA_RAM")))
 #define SLOW_RAM __attribute__ ((section(".SLOW_RAM")))
-#else
+#elif  defined (AT32F43x)
+#define DMA_RAM __attribute__ ((section(".DMA_RAM")))
+#define SLOW_RAM __attribute__ ((section(".SLOW_RAM")))
+#else 
 #define DMA_RAM
 #define SLOW_RAM
 #endif

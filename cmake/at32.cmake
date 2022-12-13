@@ -1,4 +1,4 @@
-#include(at32-bootloader)
+include(at32-bootloader)
 include(at32f4)
 
 include(CMakeParseArguments)
@@ -348,8 +348,10 @@ function(target_at32)
         LINKER_SCRIPT ${args_LINKER_SCRIPT}
         OPTIMIZATION ${args_OPTIMIZATION}
 
+        OUTPUT_BIN_FILENAME main_bin_filename
         OUTPUT_HEX_FILENAME main_hex_filename
         OUTPUT_TARGET_NAME main_target_name
+
     )
 
     set_property(TARGET ${main_target_name} PROPERTY OPENOCD_TARGET ${args_OPENOCD_TARGET})
@@ -360,7 +362,7 @@ function(target_at32)
 
     if(args_BOOTLOADER)
         # Bootloader for the target
-        # TODO target/link/at32_flash_f43xM_bl.ld
+        # TODO target/link/at32_flash_f43xM_bl.ld 
         set(bl_suffix _bl)
         add_at32_executable(
             NAME ${name}${bl_suffix}

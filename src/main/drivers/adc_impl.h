@@ -28,7 +28,7 @@
 #define ADC_TAG_MAP_COUNT 10
 #endif
 
-#if defined(STM32H7)
+#if defined(STM32H7)||defined(AT32F43x)
 #define ADC_VALUES_ALIGNMENT(def) DMA_RAM def __attribute__ ((aligned (32)))
 #else
 #define ADC_VALUES_ALIGNMENT(def) def 

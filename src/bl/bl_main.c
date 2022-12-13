@@ -201,19 +201,9 @@ void bootloader_jump_to_app(void)
         CRM->cfg_bit.ahbdiv = 0;
         CRM->cfg_bit.apb1div = 0;
         CRM->cfg_bit.apb2div = 0;
-        CRM->cfg_bit.adcdiv_l = 0;
-        CRM->cfg_bit.adcdiv_h = 0;
-        CRM->cfg_bit.clkout_sel = 0;
         CRM->ctrl_bit.hexten = 0;
         CRM->ctrl_bit.cfden = 0;
         CRM->ctrl_bit.pllen = 0;
-        CRM->cfg_bit.pllrcs = 0;
-        CRM->cfg_bit.pllhextdiv = 0;
-        CRM->cfg_bit.pllmult_l = 0;
-        CRM->cfg_bit.pllmult_h = 0;
-        CRM->cfg_bit.usbdiv_l = 0;
-        CRM->cfg_bit.usbdiv_h = 0;
-        CRM->cfg_bit.pllrange = 0;
         /* Disable all interrupts and clear pending bits */
         CRM->clkint_bit.lickstblfc = 0;
         CRM->clkint_bit.lextstblfc = 0;

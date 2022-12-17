@@ -33,6 +33,10 @@
 #define CLOCKSPEED 8000000    // i2c clockspeed 400kHz default (conform specs), 800kHz  and  1200kHz (Betaflight default)
 
 #define I2Cx_ADDRESS                     0x00
+// Clock period in us during unstick transfer
+#define UNSTICK_CLK_US 10
+// Allow 500us for clock strech to complete during unstick
+#define UNSTICK_CLK_STRETCH (500/UNSTICK_CLK_US)
 
 static void i2cUnstick(IO_t scl, IO_t sda);
 
@@ -127,8 +131,9 @@ void I2C3_EVT_IRQHandler(void)
 
 static bool i2cHandleHardwareFailure(I2CDevice device)
 {
+    (void)device;
     i2cErrorCount++;
-    i2cInit(device);
+    //i2cInit(device);
     return false;
 }
 
@@ -146,9 +151,17 @@ bool i2cWriteBuffer(I2CDevice device, uint8_t addr_, uint8_t reg_, uint8_t len_,
 
     if ((reg_ == 0xFF || len_ == 0) && allowRawAccess) {
         status = i2c_master_transmit(&state->handle, addr_ << 1, data, len_, I2C_DEFAULT_TIMEOUT);
+        if(status !=  I2C_OK)
+        {
+          /* wait for the stop flag to be set  */
+          i2c_wait_flag(&state->handle, I2C_STOPF_FLAG, I2C_EVENT_CHECK_NONE, I2C_DEFAULT_TIMEOUT);
+
+          /* clear stop flag */
+      	  i2c_flag_clear(state->handle.i2cx, I2C_STOPF_FLAG);
+        }
     }
     else {
-        status = i2c_memory_write(&state->handle,I2C_MEM_ADDR_WIDIH_8, addr_ << 1, reg_,  data, len_, I2C_DEFAULT_TIMEOUT);
+        status = i2c_memory_write(&state->handle,I2C_MEM_ADDR_WIDIH_8, addr_ << 1, reg_,  data, len_,(len_==1? I2C_TIMEOUT: I2C_DEFAULT_TIMEOUT));
         //status = i2c_memory_write_int(&state->handle,I2C_MEM_ADDR_WIDIH_8, addr_ << 1, reg_,  data, len_, I2C_DEFAULT_TIMEOUT);
         
         if(status !=  I2C_OK)
@@ -315,16 +328,15 @@ void i2cInit(I2CDevice device)
 
     if (hardware->dev == NULL)
         return;
- 
-    // Enable RCC
-    RCC_ClockCmd(hardware->rcc, ENABLE);
 
     IO_t scl = IOGetByTag(hardware->scl);
     IO_t sda = IOGetByTag(hardware->sda);
 
     IOInit(scl, OWNER_I2C, RESOURCE_I2C_SCL, RESOURCE_INDEX(device));
     IOInit(sda, OWNER_I2C, RESOURCE_I2C_SDA, RESOURCE_INDEX(device));
-
+    // Enable RCC
+    RCC_ClockCmd(hardware->rcc, ENABLE);
+    
     i2cUnstick(scl, sda);
 
     // Init pins
@@ -419,27 +431,27 @@ static void i2cUnstick(IO_t scl, IO_t sda)
     // We need 9 clock pulses + STOP condition
     for (i = 0; i < 9; i++) {
         // Wait for any clock stretching to finish
-        int timeout = 100;
+        int timeout = UNSTICK_CLK_STRETCH;
         while (!IORead(scl) && timeout) {
-            delayMicroseconds(5);
+            delayMicroseconds(UNSTICK_CLK_US);
             timeout--;
         }
 
         // Pull low
         IOLo(scl); // Set bus low
-        delayMicroseconds(5);
+        delayMicroseconds(UNSTICK_CLK_US/2);
         IOHi(scl); // Set bus high
-        delayMicroseconds(5);
+        delayMicroseconds(UNSTICK_CLK_US/2);
     }
 
     // Generate a stop condition in case there was none
     IOLo(scl);
-    delayMicroseconds(5);
+    delayMicroseconds(UNSTICK_CLK_US/2);
     IOLo(sda);
-    delayMicroseconds(5);
+    delayMicroseconds(UNSTICK_CLK_US/2);
 
     IOHi(scl); // Set bus scl high
-    delayMicroseconds(5);
+    delayMicroseconds(UNSTICK_CLK_US/2);
     IOHi(sda); // Set bus sda high
 }
 

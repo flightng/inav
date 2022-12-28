@@ -84,6 +84,12 @@
 #define MPU9250_SPI_BUS         BUS_SPI1
 #define MPU9250_CS_PIN          SPI1_NSS_PIN
 
+// BMI270
+#define USE_IMU_BMI270
+#define IMU_BMI270_ALIGN        CW0_DEG
+#define BMI270_SPI_BUS          BUS_SPI1
+#define BMI270_CS_PIN           SPI1_NSS_PIN
+
 // *************** I2C/Baro/Mag/EXT*********************
 #define USE_I2C
 #define USE_I2C_DEVICE_3

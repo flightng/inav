@@ -174,6 +174,10 @@ bool i2cWriteBuffer(I2CDevice device, uint8_t addr_, uint8_t reg_, uint8_t len_,
         }
     }
 
+    if (status == I2C_ERR_STEP_1) {//BUSY
+        return false;
+    }
+
     if (status != I2C_OK)
         return i2cHandleHardwareFailure(device);
 

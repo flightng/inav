@@ -86,21 +86,21 @@
 
 // *************** I2C/Baro/Mag/EXT*********************
 #define USE_I2C
-#define USE_I2C_DEVICE_3
-#define I2C3_SCL                PB10        // SCL pad
-#define I2C3_SDA                PB11        // SDA pad
+#define USE_I2C_DEVICE_2
+#define I2C2_SCL                PB10        // SCL pad
+#define I2C2_SDA                PB11        // SDA pad
 #define USE_I2C_PULLUP
 
 #define USE_BARO
-#define BARO_I2C_BUS            BUS_I2C3
+#define BARO_I2C_BUS            BUS_I2C2
 #define USE_BARO_BMP280
 #define USE_BARO_DPS310
 
 #define USE_MAG
-#define MAG_I2C_BUS             BUS_I2C3
+#define MAG_I2C_BUS             BUS_I2C2
 #define USE_MAG_HMC5883
 #define USE_MAG_QMC5883
-#define DEFAULT_I2C_BUS         BUS_I2C3
+#define DEFAULT_I2C_BUS         BUS_I2C2
 
 // todo temp sensors
 //#define TEMPERATURE_I2C_BUS     BUS_I2C1

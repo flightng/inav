@@ -30,7 +30,7 @@
 
 #if !defined(SOFT_I2C) && defined(USE_I2C)
 
-#define CLOCKSPEED 8000000    // i2c clockspeed 400kHz default (conform specs), 800kHz  and  1200kHz (Betaflight default)
+#define CLOCKSPEED 800000    // i2c clockspeed 400kHz default (conform specs), 800kHz  and  1200kHz (Betaflight default)
 
 #define I2Cx_ADDRESS                     0x00
 // Clock period in us during unstick transfer
@@ -81,8 +81,9 @@ static volatile uint16_t i2cErrorCount = 0;
 // functions expect the timeout to be in ticks.
 // Since we're setting up the ticks a 1khz, each
 // tick equals 1ms.
-//#define I2C_DEFAULT_TIMEOUT     (I2C_TIMEOUT / 1000)
-#define I2C_DEFAULT_TIMEOUT     (0x8700)
+// AT32F4 i2c TIMEOUT USING loop times 
+#define I2C_DEFAULT_TIMEOUT     (I2C_TIMEOUT*288 / 1000  )
+//#define I2C_DEFAULT_TIMEOUT     (0xD80)
 
 typedef struct {
     bool initialised;
@@ -133,7 +134,7 @@ static bool i2cHandleHardwareFailure(I2CDevice device)
 {
     (void)device;
     i2cErrorCount++;
-    //i2cInit(device);
+    i2cInit(device);
     return false;
 }
 
@@ -161,7 +162,7 @@ bool i2cWriteBuffer(I2CDevice device, uint8_t addr_, uint8_t reg_, uint8_t len_,
         }
     }
     else {
-        status = i2c_memory_write(&state->handle,I2C_MEM_ADDR_WIDIH_8, addr_ << 1, reg_,  data, len_,(len_==1? I2C_TIMEOUT: I2C_DEFAULT_TIMEOUT));
+        status = i2c_memory_write(&state->handle,I2C_MEM_ADDR_WIDIH_8, addr_ << 1, reg_,  data, len_, I2C_DEFAULT_TIMEOUT);
         //status = i2c_memory_write_int(&state->handle,I2C_MEM_ADDR_WIDIH_8, addr_ << 1, reg_,  data, len_, I2C_DEFAULT_TIMEOUT);
         
         if(status !=  I2C_OK)
@@ -466,9 +467,9 @@ bool i2cBusy(I2CDevice device, bool *error)
 
     i2cState_t * state = &(i2cState[device]);
     
-    // if (error) {
-    //     *error = state->handle.error_code;
-    // }
+    if (error) {
+        *error = state->handle.error_code==I2C_OK?false:true;
+    }
     
     if(state->handle.error_code ==I2C_OK){
         

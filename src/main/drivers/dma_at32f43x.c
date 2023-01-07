@@ -144,11 +144,11 @@ void dmaSetHandler(DMA_t dma, dmaCallbackHandlerFuncPtr callback, uint32_t prior
 uint32_t dmaGetChannelByTag(dmaTag_t tag)
 {
     // DMA1_CHANNEL1 
-    static const uint32_t dmaChannel[14] = { DMA1_CHANNEL1, DMA1_CHANNEL2, DMA1_CHANNEL3, DMA1_CHANNEL4, DMA1_CHANNEL5, DMA1_CHANNEL6, DMA1_CHANNEL7, 
+    static const dma_channel_type * dmaChannel[14] = { DMA1_CHANNEL1, DMA1_CHANNEL2, DMA1_CHANNEL3, DMA1_CHANNEL4, DMA1_CHANNEL5, DMA1_CHANNEL6, DMA1_CHANNEL7, 
     DMA2_CHANNEL1, DMA2_CHANNEL2, DMA2_CHANNEL3, DMA2_CHANNEL4, DMA2_CHANNEL5, DMA2_CHANNEL6, DMA2_CHANNEL7,
      };
 
-    return dmaChannel[(DMATAG_GET_DMA(tag)-1)*7 + DMATAG_GET_STREAM(tag)-1];
+    return (uint32_t) dmaChannel[(DMATAG_GET_DMA(tag)-1)*7 + DMATAG_GET_STREAM(tag)-1];
 }
 
 // 通过DMA通道 获取DMA_t 

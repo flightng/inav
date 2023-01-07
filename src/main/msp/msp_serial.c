@@ -267,8 +267,8 @@ static uint8_t mspSerialChecksumBuf(uint8_t checksum, const uint8_t *data, int l
 }
 
 #define JUMBO_FRAME_SIZE_LIMIT 255
-static uint8_t tmpBuf[JUMBO_FRAME_SIZE_LIMIT];
-static uint32_t sendcount = 0;
+// static uint8_t tmpBuf[JUMBO_FRAME_SIZE_LIMIT];
+// static uint32_t sendcount = 0;
 static int mspSerialSendFrame(mspPort_t *msp, const uint8_t * hdr, int hdrLen, const uint8_t * data, int dataLen, const uint8_t * crc, int crcLen)
 {
     // MSP port might be turned into a CLI port, which will make

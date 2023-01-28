@@ -14,10 +14,22 @@
 #define NVIC_PRIO_SDIO                      3
 #define NVIC_PRIO_USB                       5
 #define NVIC_PRIO_SERIALUART                5
+#define NVIC_PRIO_VCP                       7
 
-// Use all available bits for priority and zero bits to sub-priority
-#ifdef USE_HAL_DRIVER
-#define NVIC_PRIORITY_GROUPING NVIC_PRIORITYGROUP_4
+
+#if defined(AT32F43x)  
+    #ifdef USE_HAL_DRIVER
+    #define NVIC_PRIORITY_GROUPING NVIC_PRIORITY_GROUP_4
+    #else
+    #define NVIC_PRIORITY_GROUPING NVIC_PRIORITY_GROUP_4
+    #endif
 #else
-#define NVIC_PRIORITY_GROUPING NVIC_PriorityGroup_4
+    // Use all available bits for priority and zero bits to sub-priority
+    #ifdef USE_HAL_DRIVER
+    #define NVIC_PRIORITY_GROUPING NVIC_PRIORITYGROUP_4
+    #else
+    #define NVIC_PRIORITY_GROUPING NVIC_PriorityGroup_4
+    #endif
 #endif
+
+

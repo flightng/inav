@@ -131,7 +131,7 @@ typedef struct
     uint8_t  PERFORMANCE_MOVE;        // Carries information about the card's performance move
     uint8_t  AU_SIZE;                 // Carries information about the card's allocation unit size
     uint16_t ERASE_SIZE;              // Determines the number of AUs to be erased in one operation
-    uint8_t  ERASE_TIMEOUT;           // Determines the TimeOut for any number of AU erase
+    uint8_t  SD_ERASE_TIMEOUT;           // Determines the TimeOut for any number of AU erase
     uint8_t  ERASE_OFFSET;            // Carries information about the erase offset
 } SD_CardStatus_t;
 

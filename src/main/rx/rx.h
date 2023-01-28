@@ -51,6 +51,8 @@
 
 #define RSSI_MAX_VALUE 1023
 
+#define PPM_RCVR_TIMEOUT            0
+
 typedef enum {
     RX_FRAME_PENDING             = 0,         // No new data available from receiver
     RX_FRAME_COMPLETE            = (1 << 0),  // There is new data available
@@ -81,6 +83,7 @@ typedef enum {
     SERIALRX_MAVLINK,
 } rxSerialReceiverType_e;
 
+#define MAX_SUPPORTED_RC_PPM_CHANNEL_COUNT          16
 #define MAX_SUPPORTED_RC_CHANNEL_COUNT              18
 
 #define NON_AUX_CHANNEL_COUNT 4

@@ -38,6 +38,21 @@
 
 timHardwareContext_t * timerCtx[HARDWARE_TIMER_DEFINITION_COUNT];
 
+#if defined(AT32F43x)
+uint8_t lookupTimerIndex(const tmr_type *tim)
+{
+    int i;
+
+    // let gcc do the work, switch should be quite optimized
+    for (i = 0; i < HARDWARE_TIMER_DEFINITION_COUNT; i++) {
+        if (tim == timerDefinitions[i].tim) {
+            return i;
+        }
+    }
+    // make sure final index is out of range
+    return ~1;
+}
+#else
 // return index of timer in timer table. Lowest timer has index 0
 uint8_t lookupTimerIndex(const TIM_TypeDef *tim)
 {
@@ -53,6 +68,7 @@ uint8_t lookupTimerIndex(const TIM_TypeDef *tim)
     // make sure final index is out of range
     return ~1;
 }
+#endif
 
 void timerConfigBase(TCH_t * tch, uint16_t period, uint32_t hz)
 {
@@ -156,9 +172,14 @@ void timerChConfigIC(TCH_t * tch, bool polarityRising, unsigned inputFilterSampl
 
 uint16_t timerGetPeriod(TCH_t * tch)
 {
-    return tch->timHw->tim->ARR;
+    // todo pr周期寄存器
+    #if defined(AT32F43x)
+        return tch->timHw->tim->pr;
+    #else
+        return tch->timHw->tim->ARR;
+    #endif
 }
-
+//timerHardware  target.c
 void timerInit(void)
 {
     memset(timerCtx, 0, sizeof (timerCtx));
@@ -171,6 +192,7 @@ void timerInit(void)
 
     /* Before 2.0 timer outputs were initialized to IOCFG_AF_PP_PD even if not used */
     /* To keep compatibility make sure all timer output pins are mapped to INPUT with weak pull-down */
+    // todo GPIO_OUTPUT_PUSH_PULL
     for (int i = 0; i < timerHardwareCount; i++) {
         const timerHardware_t *timerHardwarePtr = &timerHardware[i];
         IOConfigGPIO(IOGetByTag(timerHardwarePtr->tag), IOCFG_IPD);

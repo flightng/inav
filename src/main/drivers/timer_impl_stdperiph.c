@@ -59,7 +59,7 @@ void impl_timerConfigBase(TCH_t * tch, uint16_t period, uint32_t hz)
 {
     TIM_TypeDef * tim = tch->timCtx->timDef->tim;
     TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
-
+        // 
     TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
     TIM_TimeBaseStructure.TIM_Period = (period - 1) & 0xffff; // AKA TIMx_ARR
     TIM_TimeBaseStructure.TIM_Prescaler = lrintf((float)timerGetBaseClock(tch) / hz + 0.01f) - 1;
@@ -118,7 +118,8 @@ static unsigned getFilter(unsigned ticks)
 void impl_timerChConfigIC(TCH_t * tch, bool polarityRising, unsigned inputFilterTicks)
 {
     TIM_ICInitTypeDef TIM_ICInitStructure;
-
+    //tmr_input_config_type
+    
     TIM_ICStructInit(&TIM_ICInitStructure);
     TIM_ICInitStructure.TIM_Channel = lookupTIMChannelTable[tch->timHw->channelIndex];
     TIM_ICInitStructure.TIM_ICPolarity = polarityRising ? TIM_ICPolarity_Rising : TIM_ICPolarity_Falling;

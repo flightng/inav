@@ -2263,11 +2263,6 @@ static bool isWaypointReached(const fpVector3_t * waypointPos, const int32_t * w
     }
 
     if (navGetStateFlags(posControl.navState) & NAV_AUTO_WP || posControl.flags.rthTrackbackActive) {
-        // If WP turn smoothing CUT option used WP is reached when start of turn is initiated
-        if (navConfig()->fw.wp_turn_smoothing == WP_TURN_SMOOTHING_CUT && posControl.flags.wpTurnSmoothingActive) {
-            posControl.flags.wpTurnSmoothingActive = false;
-            return true;
-        }
         // Check if waypoint was missed based on bearing to WP exceeding 100 degrees relative to waypoint Yaw
         // Same method for turn smoothing option but relative bearing set at 60 degrees
         uint16_t relativeBearing = posControl.flags.wpTurnSmoothingActive ? 6000 : 10000;
@@ -2645,17 +2640,10 @@ static bool rthAltControlStickOverrideCheck(unsigned axis)
  * Reverts to normal RTH heading direct to home when end of track reached.
  * Trackpoints logged with precedence for course/altitude changes. Distance based changes
  * only logged if no course/altitude changes logged over an extended distance.
- * Tracking suspended during fixed wing loiter (PosHold and WP Mode timed hold).
  * --------------------------------------------------------------------------------- */
  static void updateRthTrackback(bool forceSaveTrackPoint)
 {
-    static bool suspendTracking = false;
-    bool fwLoiterIsActive = STATE(AIRPLANE) && (NAV_Status.state == MW_NAV_STATE_HOLD_TIMED || FLIGHT_MODE(NAV_POSHOLD_MODE));
-    if (!fwLoiterIsActive && suspendTracking) {
-        suspendTracking = false;
-    }
-
-    if (navConfig()->general.flags.rth_trackback_mode == RTH_TRACKBACK_OFF || FLIGHT_MODE(NAV_RTH_MODE) || !ARMING_FLAG(ARMED || suspendTracking)) {
+    if (navConfig()->general.flags.rth_trackback_mode == RTH_TRACKBACK_OFF || FLIGHT_MODE(NAV_RTH_MODE) || !ARMING_FLAG(ARMED)) {
         return;
     }
 
@@ -2703,11 +2691,6 @@ static bool rthAltControlStickOverrideCheck(unsigned axis)
                 // if no reliable course revert to basic distance logging based on direct distance from last point - set to 20m
                 saveTrackpoint = calculateDistanceToDestination(&posControl.rthTBPointsList[posControl.activeRthTBPointIndex]) > METERS_TO_CENTIMETERS(20);
                 previousTBTripDist = posControl.totalTripDistance;
-            }
-
-            // Suspend tracking during loiter on fixed wing. Save trackpoint at start of loiter.
-            if (distanceCounter && fwLoiterIsActive) {
-                saveTrackpoint = suspendTracking = true;
             }
         }
 

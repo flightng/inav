@@ -259,6 +259,7 @@ bool icm42605GyroDetect(gyroDev_t *gyro)
     gyro->intStatusFn = gyroCheckDataReady;
     gyro->temperatureFn = NULL;
     gyro->scale = 1.0f / 16.4f;     // 16.4 dps/lsb scalefactor
+    //gyro->scale = 16000.0f / 32768.0f;
     gyro->gyroAlign = gyro->busDev->param;
 
     return true;

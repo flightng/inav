@@ -170,6 +170,6 @@ void systemInit(void)
     // Init cycle counter
     cycleCounterInit();
 
-    // SysTick
+    // SysTick  23
     SysTick_Config(SystemCoreClock / 1000);
 }

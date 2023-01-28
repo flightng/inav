@@ -221,7 +221,18 @@ static bool accDetect(accDev_t *dev, accelerationSensor_e accHardwareToUse)
         }
         FALLTHROUGH;
 #endif
-
+#ifdef USE_IMU_LSM6DXX
+    case ACC_LSM6DXX:
+        if (lsm6dAccDetect(dev)) {
+            accHardware = ACC_LSM6DXX;
+            break;
+        }
+        /* If we are asked for a specific sensor - break out, otherwise - fall through and continue */
+        if (accHardwareToUse != ACC_AUTODETECT) {
+            break;
+        }
+        FALLTHROUGH;
+#endif
 #ifdef USE_IMU_FAKE
     case ACC_FAKE:
         if (fakeAccDetect(dev)) {

@@ -386,7 +386,7 @@ void busDeselectDevice(const busDevice_t * dev)
 }
 
 bool busIsBusy(const busDevice_t * dev)
-{
+{ 
     switch (dev->busType) {
         case BUSTYPE_SPI:
 #ifdef USE_SPI
@@ -397,8 +397,7 @@ bool busIsBusy(const busDevice_t * dev)
 #endif
         case BUSTYPE_I2C:
             // Not implemented for I2C, respond as always free
-            return false;
-
+            return i2cBusBusy(dev,NULL);
         default:
             return false;
     }

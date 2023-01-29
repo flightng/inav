@@ -209,6 +209,15 @@ STATIC_UNIT_TESTED gyroSensor_e gyroDetect(gyroDev_t *dev, gyroSensor_e gyroHard
         FALLTHROUGH;
 #endif
 
+#ifdef USE_IMU_LSM6DXX
+    case GYRO_LSM6DXX:
+        if (lsm6dGyroDetect(dev)) {
+            gyroHardware = GYRO_LSM6DXX;
+            break;
+        }
+        FALLTHROUGH;
+#endif
+
 #ifdef USE_IMU_FAKE
     case GYRO_FAKE:
         if (fakeGyroDetect(dev)) {

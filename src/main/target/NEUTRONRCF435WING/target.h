@@ -19,7 +19,7 @@
 
 #define TARGET_BOARD_IDENTIFIER "NERC"
 
-#define USBD_PRODUCT_STRING  "NeuronRC F435 MINI"
+#define USBD_PRODUCT_STRING  "NeuronRC F435 WING"
 
 /**********swd debuger reserved *****************
  *
@@ -141,13 +141,14 @@
 //#define USB_DETECT_PIN          PC14
 #define USE_USB_DETECT
 
-#define USE_UART1
-#define UART1_RX_PIN            PB7
-#define UART1_TX_PIN            PA9
+// REDEFINE for servo pwm output  
+// #define USE_UART1
+// #define UART1_RX_PIN            PB7
+// #define UART1_TX_PIN            PA9
 
-#define USE_UART2
-#define UART2_RX_PIN            PB0
-#define UART2_TX_PIN            PA2
+// #define USE_UART2
+// #define UART2_RX_PIN            PB0
+// #define UART2_TX_PIN            PA2
 
 #define USE_UART3
 #define UART3_RX_PIN            PB11
@@ -161,7 +162,7 @@
 #define UART7_RX_PIN            PB3
 #define UART7_TX_PIN            PB4
 
-#define SERIAL_PORT_COUNT       6
+#define SERIAL_PORT_COUNT       4
 
 #define DEFAULT_RX_TYPE         RX_TYPE_SERIAL
 #define SERIALRX_PROVIDER       SERIALRX_CRSF
@@ -184,6 +185,7 @@
 // #define USE_LED_STRIP
 // #define WS2811_PIN                      PB10   //TIM2_CH3
 
+// // 遥测
 // #define USE_SPEKTRUM_BIND
 // #define BIND_PIN                   PA3    //UART2_RX_PIN
 

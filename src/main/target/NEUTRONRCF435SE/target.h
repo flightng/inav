@@ -19,7 +19,7 @@
 
 #define TARGET_BOARD_IDENTIFIER "NERC"
 
-#define USBD_PRODUCT_STRING  "NeuronRC F435AIO"
+#define USBD_PRODUCT_STRING  "NeutronRC F435 SE"
 
 /**********swd debuger reserved *****************
  *

@@ -368,7 +368,7 @@ void impl_timerPWMPrepareDMA(TCH_t * tch, uint32_t dmaBufferElementCount)
 { 
     tch->dma = dmaGetByTag(tch->timHw->dmaTag);
     if (tch->dma == NULL) {
-        return false;  
+        return ;  
     }
     // tch->dma->dmaMuxref = tch->timHw->dmaMuxid;
 

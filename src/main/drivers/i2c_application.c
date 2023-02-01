@@ -99,15 +99,6 @@
 #define I2C_START                        0
 #define I2C_END                          1
 
-/**
-  * @brief  initializes peripherals used by the i2c.
-  * @param  none
-  * @retval none
-  */
-__WEAK void i2c_lowlevel_init(i2c_handle_type* hi2c)
-{
-     
-}
 
 /**
   * @brief  i2c peripheral initialization.

@@ -151,7 +151,7 @@ bool i2cWriteBuffer(I2CDevice device, uint8_t addr_, uint8_t reg_, uint8_t len_,
     i2c_status_type status;
 
     if ((reg_ == 0xFF || len_ == 0) && allowRawAccess) {
-        status = i2c_master_transmit(&state->handle, addr_ << 1, data, len_, I2C_DEFAULT_TIMEOUT);
+        status = i2c_master_transmit(&state->handle, addr_ << 1, CONST_CAST(uint8_t*, data), len_, I2C_DEFAULT_TIMEOUT);
         if(status !=  I2C_OK)
         {
           /* wait for the stop flag to be set  */
@@ -162,7 +162,7 @@ bool i2cWriteBuffer(I2CDevice device, uint8_t addr_, uint8_t reg_, uint8_t len_,
         }
     }
     else {
-        status = i2c_memory_write(&state->handle,I2C_MEM_ADDR_WIDIH_8, addr_ << 1, reg_,  data, len_, I2C_DEFAULT_TIMEOUT);
+        status = i2c_memory_write(&state->handle,I2C_MEM_ADDR_WIDIH_8, addr_ << 1, reg_, CONST_CAST(uint8_t*, data), len_, I2C_DEFAULT_TIMEOUT);
         //status = i2c_memory_write_int(&state->handle,I2C_MEM_ADDR_WIDIH_8, addr_ << 1, reg_,  data, len_, I2C_DEFAULT_TIMEOUT);
         
         if(status !=  I2C_OK)

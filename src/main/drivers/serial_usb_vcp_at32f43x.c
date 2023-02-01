@@ -295,7 +295,7 @@ void TxTimerConfig(void){
   * @param  htim: TIM handle
   * @retval None
   */
-void TMR20_OVF_IRQHandler()
+void TMR20_OVF_IRQHandler(void)
 {
 
     uint32_t buffsize;
@@ -342,12 +342,12 @@ void TMR20_OVF_IRQHandler()
 /************************************************************/
 
 //是否插入 add
-uint8_t usbIsConnected(){
+uint8_t usbIsConnected(void){
 	return (USB_CONN_STATE_DEFAULT !=otg_core_struct.dev.conn_state);
 }
 
 //是否配置 add
-uint8_t usbIsConfigured(){
+uint8_t usbIsConfigured(void){
 	return (USB_CONN_STATE_CONFIGURED ==otg_core_struct.dev.conn_state);
 }
 
@@ -374,14 +374,6 @@ static void usbVcpSetBaudRate(serialPort_t *instance, uint32_t baudRate)
     UNUSED(baudRate);
 
     // TODO implement
-}
-//set baudrate change callback
-// vcp 收到 set_line_coding 命令时，设置波特率
-static void usbVcpSetBaudRateCb(serialPort_t *instance, void (*cb)(serialPort_t *context, uint32_t baud), serialPort_t *context)
-{
-    UNUSED(instance);
-    // Register upper driver baud rate callback routine with USB driver
-    CDC_SetBaudRateCb((void (*)(void *context, uint32_t baud))cb, (void *)context);
 }
 
 static void usbVcpSetMode(serialPort_t *instance, portMode_t mode)

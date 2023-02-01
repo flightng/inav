@@ -220,10 +220,10 @@ extern SD_CardInfo_t SD_CardInfo;
 extern SD_CardType_t SD_CardType;
 
 #ifdef AT32F43x
-// TODO:sd卡还不支持，待处理
+// TODO:AT32 TARGES NOT USE SD CARD ANT TF CARD FOR NOW
 void             SD_Initialize_LL            (dma_channel_type *dma);
 #else
-void             SD_Initialize_LL            (DMA_Stream_TypeDef *dma);
+bool             SD_Initialize_LL            (DMA_Stream_TypeDef *dma);
 #endif
 bool SD_Init(void);
 bool SD_IsDetected(void);

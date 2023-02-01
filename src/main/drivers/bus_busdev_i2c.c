@@ -23,6 +23,10 @@
 
 #if defined(USE_I2C)
 
+#if !defined(UNUSED)
+#define UNUSED(x) ((void)(x))
+#endif
+
 #include "drivers/bus.h"
 #include "drivers/bus_i2c.h"
 
@@ -54,6 +58,8 @@ bool i2cBusBusy(const busDevice_t *dev, bool *error)
 #if defined(AT32F43x) 
     return i2cBusy(dev->busdev.i2c.i2cBus, error);
 #endif
+    UNUSED(dev);
+    UNUSED(error);
     return false;
 }
 #endif

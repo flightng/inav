@@ -51,6 +51,7 @@
 #include "usbd_int.h"
 #include "msc_class.h"
 #include "msc_desc.h"
+#include "usb_io.h"
 
 #define DEBOUNCE_TIME_MS 20
 

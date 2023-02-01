@@ -26,6 +26,7 @@
 #include "drivers/nvic.h"
 #include "drivers/system.h"
 #include "target/system.h"
+#include "at32f435_437_clock.h"
 
 void SetSysClock(void);
 
@@ -106,7 +107,8 @@ bool isMPUSoftReset(void)
     else
         return false;
 }
-//AT32 图 2-1 AT32F435/437地址配置 == system_isr_vector_table_base ?
+//AT32 图 2-1 AT32F435/437地址配置 == system_isr_vector_table_base ? 
+//AT32 DIAGRAM2-1 AT32F435/437 DFU BOOTLOADER ADDR
 uint32_t systemBootloaderAddress(void)
 {
     return 0x1FFF0000;
@@ -121,7 +123,8 @@ void systemClockSetup(uint8_t cpuUnderclock)
 
 void systemInit(void)
 {
-    system_clock_config();//config system clock to 288mhz usb 48mhz
+    //config system clock to 288mhz usb 48mhz
+    system_clock_config();
     // Configure NVIC preempt/priority groups
 	nvic_priority_group_config(NVIC_PRIORITY_GROUPING);
 

@@ -139,20 +139,13 @@ static void lsm6dxxConfig(gyroDev_t *gyro)
     busSetSpeed(dev, BUS_SPEED_FAST);
 }
 
-static void lsm6dxxEnableSPI(busDevice_t *dev)
-{
-    IOLo(dev->busdev.spi.csnPin);
-    delay(1);
-    IOHi(dev->busdev.spi.csnPin);
-    delay(10);
-}
+
 
 static bool lsm6dxxDetect(busDevice_t * dev)
 {
     uint8_t tmp;
     uint8_t attemptsRemaining = 5;
     busSetSpeed(dev, BUS_SPEED_INITIALIZATION);
-    lsm6dxxEnableSPI(dev);
     do {
         delay(150);
 
@@ -174,8 +167,7 @@ static bool lsm6dxxDetect(busDevice_t * dev)
 }
 
 static void lsm6dxxSpiGyroInit(gyroDev_t *gyro)
-{
-     busDevice_t *dev = &gyro->busDev;
+{   
     lsm6dxxConfig(gyro);
 }
 

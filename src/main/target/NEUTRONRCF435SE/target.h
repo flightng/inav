@@ -54,32 +54,32 @@
 #define SPI1_MOSI_PIN           PA7
 #define SPI1_NSS_PIN            PA15
 
-#define USE_EXTI 
-#define GYRO_INT_EXTI           PA8
-#define USE_MPU_DATA_READY_SIGNAL
+// #define USE_EXTI 
+// #define GYRO_INT_EXTI           PA8
+// #define USE_MPU_DATA_READY_SIGNAL
 
 // MPU6500
 #define USE_IMU_MPU6500
-#define IMU_MPU6500_ALIGN       CW0_DEG 
+#define IMU_MPU6500_ALIGN       CW180_DEG 
 #define MPU6500_SPI_BUS         BUS_SPI1
 #define MPU6500_CS_PIN          SPI1_NSS_PIN
 
 // ICM42605/ICM42688P
 #define USE_IMU_ICM42605
-#define IMU_ICM42605_ALIGN      CW0_DEG
+#define IMU_ICM42605_ALIGN      CW180_DEG
 #define ICM42605_SPI_BUS        BUS_SPI1
 #define ICM42605_CS_PIN         SPI1_NSS_PIN
-#define ICM42605_EXTI_PIN       GYRO_INT_EXTI
+// #define ICM42605_EXTI_PIN       GYRO_INT_EXTI
 
 // BMI270
 #define USE_IMU_BMI270
-#define IMU_BMI270_ALIGN        CW0_DEG
+#define IMU_BMI270_ALIGN        CW180_DEG
 #define BMI270_SPI_BUS          BUS_SPI1
 #define BMI270_CS_PIN           SPI1_NSS_PIN
 
 // LSM6DXX
 #define USE_IMU_LSM6DXX
-#define IMU_LSM6DXX_ALIGN        CW0_DEG
+#define IMU_LSM6DXX_ALIGN        CW180_DEG
 #define LSM6DXX_CS_PIN           SPI1_NSS_PIN
 #define LSM6DXX_SPI_BUS          BUS_SPI1
 

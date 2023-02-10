@@ -35,8 +35,6 @@
 #include "drivers/timer_impl.h"
 
 const uint16_t lookupDMASourceTable[4] = { TMR_C1_DMA_REQUEST, TMR_C2_DMA_REQUEST, TMR_C3_DMA_REQUEST, TMR_C4_DMA_REQUEST };
-//const uint16_t lookupDMASourceTable[4] = { TMR_C1_RECAPTURE_FLAG, TMR_C2_RECAPTURE_FLAG, TMR_C3_RECAPTURE_FLAG, TMR_C4_RECAPTURE_FLAG };
-
 
 const uint8_t lookupTIMChannelTable[4] = { TMR_C1_FLAG, TMR_C2_FLAG, TMR_C3_FLAG, TMR_C4_FLAG };
 
@@ -44,7 +42,7 @@ void impl_timerInitContext(timHardwareContext_t * timCtx)
 {
     (void)timCtx;   // NoOp
 }
-// 中断优先级 
+// Configure the interrupt priority 
 void impl_timerNVICConfigure(TCH_t * tch, int irqPriority)
 {
     if (tch->timCtx->timDef->irq) {
@@ -61,7 +59,7 @@ void impl_timerConfigBase(TCH_t * tch, uint16_t period, uint32_t hz)
     tmr_type * tim = tch->timCtx->timDef->tim;
     tmr_base_init(tim, (period - 1) & 0xffff,  lrintf((float)timerGetBaseClock(tch) / hz + 0.01f) - 1);
     tmr_clock_source_div_set(tim, TMR_CLOCK_DIV1);
-    tmr_cnt_dir_set(tim, TMR_COUNT_UP);  /* 向上计数（默认） */
+    tmr_cnt_dir_set(tim, TMR_COUNT_UP);  //Count up (default)
 }
 
 void impl_enableTimer(TCH_t * tch)
@@ -72,7 +70,6 @@ void impl_enableTimer(TCH_t * tch)
 void impl_timerPWMStart(TCH_t * tch)
 {
     tmr_output_enable(tch->timHw->tim,TRUE);
-    //TIM_CtrlPWMOutputs(tch->timHw->tim, ENABLE);
 }
 
 void impl_timerEnableIT(TCH_t * tch, uint32_t interrupt)
@@ -214,7 +211,6 @@ void impl_timerPWMConfigChannel(TCH_t * tch, uint16_t value)
             tmr_output_struct.oc_polarity =  inverted ? TMR_OUTPUT_ACTIVE_LOW : TMR_OUTPUT_ACTIVE_HIGH;
             tmr_output_struct.oc_idle_state = TRUE;
         }
-    //TIM_OC1PreloadConfig
     switch (tch->timHw->channelIndex) {
         case 0:
             tmr_output_channel_config(tch->timHw->tim,TMR_SELECT_CHANNEL_1, &tmr_output_struct);
@@ -262,13 +258,13 @@ volatile timCCR_t * impl_timerCCR(TCH_t * tch)
     return NULL;
 }
 
-// 通道控制寄存器 ctrl --cce
+// Set the channel control register
 void impl_timerChCaptureCompareEnable(TCH_t * tch, bool enable)
 {
     tmr_channel_enable(tch->timHw->tim, lookupTIMChannelTable[tch->timHw->channelIndex],(enable ? TRUE : FALSE));
 }
 
-// todo lookupDMASourceTable
+// lookupDMASourceTable
 static void impl_timerDMA_IRQHandler(DMA_t descriptor)
 {
     if (DMA_GET_FLAG_STATUS(descriptor, DMA_IT_TCIF)) {
@@ -289,40 +285,28 @@ bool impl_timerPWMConfigChannelDMA(TCH_t * tch, void * dmaBuffer, uint8_t dmaBuf
     if (tch->dma == NULL) {
         return false;  
     }
-    // tch->dma->dmaMuxref = tch->timHw->dmaMuxid;
 
     // If DMA is already in use - abort
     if (tch->dma->owner != OWNER_FREE) {
         return false;
     }
 
-    // We assume that timer channels are already initialized by calls to:
-    //  timerConfigBase
-    //  timerPWMConfigChannel
+    // We assume that timer channels are already initialized by calls to
     tmr_output_enable(timer, TRUE);
-    // todo cc 
-    //TIM_ARRPreloadConfig(timer, ENABLE);
-    // 启用或禁用 TMR 周期缓冲区
+
+    // enable The TMR periodic buffer register
     tmr_period_buffer_enable(timer,TRUE);
 
-    //TIM_CCxCmd(timer, lookupTIMChannelTable[tch->timHw->channelIndex], TIM_CCx_Enable);
     tmr_channel_enable(timer, lookupTIMChannelTable[tch->timHw->channelIndex],TRUE);
 
-    //TIM_Cmd(timer, ENABLE);
     tmr_counter_enable(timer, TRUE);
     dmaInit(tch->dma, OWNER_TIMER, 0);
     
     dmaSetHandler(tch->dma, impl_timerDMA_IRQHandler, NVIC_PRIO_TIMER_DMA, (uint32_t)tch);
-
-    //DMA_DeInit(tch->dma->ref);
     dma_reset(tch->dma->ref);
-    //DMA_Cmd(tch->dma->ref, DISABLE);
     dma_channel_enable(tch->dma->ref,FALSE);
     
-    //DMA_DeInit(tch->dma->ref);
     dma_reset(tch->dma->ref);
-
-    //DMA_StructInit(&DMA_InitStructure);
     dma_default_para_init(&dma_init_struct);
 
     dma_init_struct.peripheral_base_addr = (uint32_t)impl_timerCCR(tch);
@@ -353,12 +337,10 @@ bool impl_timerPWMConfigChannelDMA(TCH_t * tch, void * dmaBuffer, uint8_t dmaBuf
     dma_init_struct.direction = DMA_DIR_MEMORY_TO_PERIPHERAL;
     dma_init_struct.memory_base_addr = (uint32_t)dmaBuffer;
     dma_init_struct.priority = DMA_PRIORITY_HIGH;
-    //dma_init(dmaGetChannelByTag(tch->timHw->dmaTag), &dma_init_struct);
     dma_init(tch->dma->ref, &dma_init_struct);
 
-    //TODO 设置DMA请求弹性映射
+    //Set DMA request Mux mapping
     dmaMuxEnable(tch->dma, tch->timHw->dmaMuxid);
-    //DMA_ITConfig(tch->dma->ref, DMA_IT_TC, ENABLE);
     dma_interrupt_enable(tch->dma->ref, DMA_IT_TCIF, TRUE);
 
     return true;
@@ -370,7 +352,6 @@ void impl_timerPWMPrepareDMA(TCH_t * tch, uint32_t dmaBufferElementCount)
     if (tch->dma == NULL) {
         return ;  
     }
-    // tch->dma->dmaMuxref = tch->timHw->dmaMuxid;
 
     // Make sure we terminate any DMA transaction currently in progress
     // Clear the flag as well, so even if DMA transfer finishes while within ATOMIC_BLOCK
@@ -378,14 +359,12 @@ void impl_timerPWMPrepareDMA(TCH_t * tch, uint32_t dmaBufferElementCount)
     ATOMIC_BLOCK(NVIC_PRIO_MAX) {
         dma_channel_enable(tch->dma->ref,FALSE);
         tmr_dma_request_enable(tch->timHw->tim, lookupDMASourceTable[tch->timHw->channelIndex], FALSE);
-        // dma
+        // clear dma flag
         DMA_CLEAR_FLAG(tch->dma, DMA_IT_TCIF);
         
     }
-    //DMA_SetCurrDataCounter(tch->dma->ref, dmaBufferElementCount); 
     dma_data_number_set(tch->dma->ref, dmaBufferElementCount); 
-     //TODO prepare 中不需要重新设置dmamux
-    // dmaMuxEnable(tch->dma, tch->dma->dmaMuxref);
+     
     dma_channel_enable(tch->dma->ref,TRUE);
     tch->dmaState = TCH_DMA_READY;
 }
@@ -416,7 +395,6 @@ void impl_timerPWMStartDMA(TCH_t * tch)
     }
 
     if (dmaSources) {
-        //TIM_SetCounter(tch->timHw->tim, 0);
         tmr_counter_value_set(tch->timHw->tim, 0);
         tmr_dma_request_enable(tch->timHw->tim, dmaSources, TRUE);
     }
@@ -424,10 +402,6 @@ void impl_timerPWMStartDMA(TCH_t * tch)
 
 void impl_timerPWMStopDMA(TCH_t * tch)
 {
-    //DMA_Cmd(tch->dma->ref, DISABLE);
-    //TIM_DMACmd(tch->timHw->tim, lookupDMASourceTable[tch->timHw->channelIndex], DISABLE);
-    //TIM_Cmd(tch->timHw->tim, ENABLE);
-    
     dma_channel_enable(tch->dma->ref,FALSE);
     tmr_dma_request_enable(tch->timHw->tim, lookupDMASourceTable[tch->timHw->channelIndex], FALSE);
     tmr_counter_enable(tch->timHw->tim, TRUE);

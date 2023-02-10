@@ -45,7 +45,7 @@ int config_streamer_impl_write_word(config_streamer_t *c, config_streamer_buffer
     if (c->err != 0) {
         return c->err;
     }
-    // 从扇区开始地址擦除
+    // Erases sectors from the start address
     if (c->address % FLASH_PAGE_SIZE == 0) {
         const flash_status_type status =flash_sector_erase(c->address);
 		   if (status != FLASH_OPERATE_DONE) {

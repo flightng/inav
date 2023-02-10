@@ -13,7 +13,9 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Cleanflight.  If not, see <http://www.gnu.org/licenses/>.
- * author : emsr
+ * author : emsr (shanggl@wo.cn)
+ * hw_config is more modified and is implemented using emsr's VCP code
+ * (implemented using timers)
  */
 
 #include <stdint.h>
@@ -49,8 +51,6 @@ otg_core_type otg_core_struct;
 #define USB_TIMEOUT  50
 
 static vcpPort_t vcpPort;
-
-// hw_config 涉及改动较多，这里使用二木BF的VCP代码，定时器实现
 
 /**
   * @brief  usb 48M clock select
@@ -341,12 +341,10 @@ void TMR20_OVF_IRQHandler(void)
 
 /************************************************************/
 
-//是否插入 add
 uint8_t usbIsConnected(void){
 	return (USB_CONN_STATE_DEFAULT !=otg_core_struct.dev.conn_state);
 }
 
-//是否配置 add
 uint8_t usbIsConfigured(void){
 	return (USB_CONN_STATE_CONFIGURED ==otg_core_struct.dev.conn_state);
 }
@@ -372,16 +370,12 @@ static void usbVcpSetBaudRate(serialPort_t *instance, uint32_t baudRate)
 {
     UNUSED(instance);
     UNUSED(baudRate);
-
-    // TODO implement
 }
 
 static void usbVcpSetMode(serialPort_t *instance, portMode_t mode)
 {
     UNUSED(instance);
     UNUSED(mode);
-
-    // TODO implement
 }
 
 static bool isUsbVcpTransmitBufferEmpty(const serialPort_t *instance)
@@ -396,45 +390,34 @@ static uint32_t usbVcpAvailable(const serialPort_t *instance)
     uint32_t available=0;
 
     available=APP_Rx_ptr_in-APP_Rx_ptr_out;
-    if(available ==0){//是否还有没copy到缓存里的
+    if(available ==0){
+        // check anything that hasn't been copied into the cache
         cdc_struct_type *pcdc = (cdc_struct_type *)otg_core_struct.dev.class_handler->pdata;
 		if(pcdc->g_rx_completed == 1){
 			available=pcdc->g_rxlen;
 		}
     } 
     return available;
-    //return CDC_Receive_BytesAvailable();
 }
 
 static uint8_t usbVcpRead(serialPort_t *instance)
 {
     UNUSED(instance);
 
-    // uint8_t buf[1];
-
-    // while (true) {
-    //     if (CDC_Receive_DATA(buf, 1))
-    //         return buf[0];
-    // }
-
-    //检查缓存是否非空，如空，增加一次读取
+    // Check the cache is empty. If empty, add a read
    if ((APP_Rx_ptr_in==0)||(APP_Rx_ptr_out == APP_Rx_ptr_in)){
 	   APP_Rx_ptr_out=0;
-	   APP_Rx_ptr_in=usb_vcp_get_rxdata(&otg_core_struct.dev,APP_Rx_Buffer);// usb 每次 最大64 字节，不会溢出
+	   APP_Rx_ptr_in=usb_vcp_get_rxdata(&otg_core_struct.dev,APP_Rx_Buffer);// usb Maximum 64 bytes each time
 	   if(APP_Rx_ptr_in==0)
 	   {
-		   //没有读到数据,返回一个0 ，避免返回上次的脏数据
+		   // No data is read, return 0
 		   return 0;
 	   }
    }
    return APP_Rx_Buffer[APP_Rx_ptr_out++];
 }
 
-// 分多次发送 todo 
-//写buffer数据到vpc 需要实现
-//这里有bug， 调用write 的时候是写到了缓存里，如果缓存满了仍然未发送，则会内存溢出死机，比如在Cli 初始化时，设置serialWriteBufShim
-//重新理解函数名， 为想serial 写入一个缓存块，直接走vcp发出去
-//但是这样修改仍然有问题，在msp 的处理中，报文头、数据、crc 3个包被分3次发送，导致接收方无法一次性接收、校验
+// Write buffer data to vpc 
 static void usbVcpWriteBuf(serialPort_t *instance, const void *data, int count)
 {
     UNUSED(instance);
@@ -547,7 +530,7 @@ void usbVcpInitHardware(void)
      /* select usb 48m clcok source */
      usb_clock48m_select(USB_CLK_HEXT);
 
-     /* enable otgfs irq,不能设置太高的优先级，会干扰spi 的dma中断通信 */
+     /* enable otgfs irq,cannot set too high priority */
      nvic_irq_enable(OTG_IRQ,NVIC_PRIO_USB,0);
 
      usbGenerateDisconnectPulse();
@@ -559,7 +542,7 @@ void usbVcpInitHardware(void)
                &cdc_class_handler,
                &cdc_desc_handler); 
 
-    //CONFIG TX TIMER
+    //config TX timer
     TxTimerConfig();
 }
 

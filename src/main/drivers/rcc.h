@@ -19,9 +19,7 @@ enum rcc_reg {
 };
  
 #define RCC_ENCODE(reg, mask) (((reg) << 5) | LOG2_32BIT(mask))
-//ahben1 AHB 外设时钟使能寄存器 1 
-//apb1en APB1 外设时钟使能寄存器
-//apb2en APB2 外设时钟使能寄存器
+
 #ifdef AT32F43x
 
 #define RCC_AHB1(periph) RCC_ENCODE(RCC_AHB1,   CRM_AHB1_ ## periph ## _PER_MASK)

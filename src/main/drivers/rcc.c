@@ -9,7 +9,6 @@ void RCC_ClockCmd(rccPeriphTag_t periphTag, FunctionalState NewState)
 {
     int tag = periphTag >> 5;
     uint32_t mask = 1 << (periphTag & 0x1f);
-    // todo base + gpioaen 
     switch (tag) 
     {
 
@@ -123,7 +122,7 @@ void RCC_ResetCmd(rccPeriphTag_t periphTag, FunctionalState NewState)
                 RCC_BIT_CMD(RCC->APB4RSTR, mask, NewState);
                 break;
         #endif
-        // //ahbrst1 apb1rst 
+ 
         #if defined(AT32F43x) 
             case RCC_AHB1:
                 RCC_BIT_CMD(CRM->ahbrst1, mask, NewState);

@@ -68,7 +68,7 @@ static void i2cUnstick(IO_t scl, IO_t sda);
 #define I2C3_SDA PC1
 #endif
 
-// 设置中断号
+//Define thi I2C hardware map
 static i2cDevice_t i2cHardwareMap[I2CDEV_COUNT] = {
     { .dev = I2C1, .scl = IO_TAG(I2C1_SCL), .sda = IO_TAG(I2C1_SDA), .rcc = RCC_APB1(I2C1), .speed = I2C_SPEED_400KHZ, .ev_irq = I2C1_EVT_IRQn, .er_irq = I2C1_ERR_IRQn, .af = GPIO_MUX_8 },
     { .dev = I2C2, .scl = IO_TAG(I2C2_SCL), .sda = IO_TAG(I2C2_SDA), .rcc = RCC_APB1(I2C2), .speed = I2C_SPEED_400KHZ, .ev_irq = I2C2_EVT_IRQn, .er_irq = I2C2_ERR_IRQn, .af = GPIO_MUX_4 },
@@ -404,10 +404,10 @@ void i2cInit(I2CDevice device)
     }
 
     i2c_own_address1_set(pHandle->i2cx, I2C_ADDRESS_MODE_7BIT, 0x0);
-    //i2c_own_address2_enable(pHandle->i2cx, false); // 双地址模式
+    //i2c_own_address2_enable(pHandle->i2cx, false); // enable or disable own address 2
     //i2c_own_address2_set(pHandle->i2cx, I2C_ADDRESS_MODE_7BIT, 0x0);
-    //i2c_general_call_enable(pHandle->i2cx, false); // 广播使能
-    //i2c_clock_stretch_enable(pHandle->i2cx, true); // 时钟延展
+    //i2c_general_call_enable(pHandle->i2cx, false); // enable or disable general call mode
+    //i2c_clock_stretch_enable(pHandle->i2cx, true); // enable or disable clock stretch
     
     nvic_irq_enable(hardware->er_irq,NVIC_PRIO_I2C_ER, 0);
     nvic_irq_enable(hardware->ev_irq, NVIC_PRIO_I2C_EV,0);

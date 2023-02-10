@@ -47,7 +47,6 @@ typedef struct uartDevice_s {
     uint32_t irqPriority;
 } uartDevice_t;
 
-//static uartPort_t uartPort[MAX_UARTS];
 #ifdef USE_UART1
 static uartDevice_t uart1 =
 {
@@ -213,27 +212,8 @@ static uartDevice_t* uartHardwareMap[] = {
 #endif
     };
  
-//                @arg USART_IT_TXE:  Transmit Data Register empty interrupt
-//   *            @arg USART_IT_TC:   Transmission complete interrupt
-//   *            @arg USART_IT_RXNE: Receive Data register not empty interrupt
-//   *            @arg USART_IT_IDLE: Idle line detection interrupt
-//   *            @arg USART_IT_PE:   Parity Error interrupt
-//   *            @arg USART_IT_ERR:  Error interrupt(Frame error, noise error, overrun error)
-// USART_CTSCF_FLAG： CTS（Clear To Send 清除发送）变化标志
-// USART_BFF_FLAG： 断开帧接收标志
-// USART_TDBE_FLAG： 发送 buff 空标志
-// USART_TDC_FLAG： 发送完成标志
-// USART_RDBF_FLAG： 接收数据 buff 满标志
-// USART_IDLEF_FLAG： 空闲帧标志
-// USART_ROERR_FLAG： 接收溢出标志
-// USART_NERR_FLAG： 噪声错误标志
-// USART_FERR_FLAG： 帧错误标志
-// USART_PERR_FLAG： 数据校验错误标志
- 
 void uartIrqHandler(uartPort_t *s)
 {
-    //if (USART_GetITStatus(s->USARTx, USART_IT_RXNE) == SET) {
-    // todo set of RESET
     if (usart_flag_get(s->USARTx, USART_RDBF_FLAG) == SET) {
         if (s->port.rxCallback) {
             s->port.rxCallback(s->USARTx->dt, s->port.rxCallbackData);
@@ -243,23 +223,17 @@ void uartIrqHandler(uartPort_t *s)
         }
     }
 
-    //if (USART_GetITStatus(s->USARTx, USART_IT_TXE) == SET) {
     if (usart_flag_get(s->USARTx, USART_TDBE_FLAG) == SET) {
         if (s->port.txBufferTail != s->port.txBufferHead) {
-            //USART_SendData(s->USARTx, s->port.txBuffer[s->port.txBufferTail]);
             usart_data_transmit(s->USARTx, s->port.txBuffer[s->port.txBufferTail]);
             s->port.txBufferTail = (s->port.txBufferTail + 1) % s->port.txBufferSize;
         } else {
-            //USART_ITConfig(s->USARTx, USART_IT_TXE, DISABLE);
             usart_interrupt_enable (s->USARTx, USART_TDBE_INT, FALSE);
         }
     }
 
-    //if (USART_GetITStatus(s->USARTx, USART_FLAG_ORE) == SET)
     if (usart_flag_get(s->USARTx, USART_ROERR_FLAG) == SET)
     {
-        //USART_ClearITPendingBit (s->USARTx, USART_IT_ORE);
-        // todo 
         usart_flag_clear(s->USARTx, USART_ROERR_FLAG);
     }
 }
@@ -280,8 +254,6 @@ void uartGetPortPins(UARTDevice_e device, serialPortPins_t * pins)
 
 void uartClearIdleFlag(uartPort_t *s)
 {
-    //(void) s->USARTx->SR;
-    //(void) s->USARTx->DR;
     (void) s->USARTx->sts;
     (void) s->USARTx->dt;
 }
@@ -315,7 +287,6 @@ uartPort_t *serialUART(UARTDevice_e device, uint32_t baudRate, portMode_t mode, 
         RCC_ClockCmd(uart->rcc_apb1, ENABLE);
     
     if (uart->rcc_ahb1)
-        //RCC_AHB1PeriphClockCmd(uart->rcc_ahb1, ENABLE);
         RCC_ClockCmd(uart->rcc_apb1, ENABLE);
 
     if (options & SERIAL_BIDIR) {
@@ -362,7 +333,7 @@ void USART1_IRQHandler(void)
 #endif
 
 #ifdef USE_UART2
-// USART2 - GPS or Spektrum or ?? (RX + TX by IRQ)
+// USART2 (RX + TX by IRQ)
 uartPort_t *serialUART2(uint32_t baudRate, portMode_t mode, portOptions_t options)
 {
     return serialUART(UARTDEV_2, baudRate, mode, options);

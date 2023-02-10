@@ -1,9 +1,10 @@
 /*
  * rcc_at32f43x_periph.h
  *
- *  Created on: 2022年3月19日
- *      Author: emsr (shanggl@wo.cn)
- *   仿照hal 库，为at32 各外设直接定义对应的使能、重置位
+ *  Created on: 2022/3/19
+ *  Author: emsr (shanggl@wo.cn)
+ * 
+ *  The corresponding enable and reset bits are defined for each peripheral of at32, modeled after hal library
  *  offset= log2(mask)
  */
 

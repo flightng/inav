@@ -124,10 +124,7 @@ void checkForBootLoaderRequest(void)
     volatile isrVector_t *bootloaderVector = (isrVector_t *)systemBootloaderAddress();
     __set_MSP(bootloaderVector->stackEnd);
     bootloaderVector->resetHandler();
-    // 这里判断AT32 和STM32F4XX 地址一致
-    // extern isrVector_t system_isr_vector_table_base;
-    // __set_MSP(system_isr_vector_table_base.stackEnd);
-    // system_isr_vector_table_base.resetHandler();
+
 
     while (1);
 }
@@ -182,7 +179,7 @@ void failureMode(failureMode_e mode)
 #endif
 #endif //UNIT_TEST
 }
-// Tightly-Coupled Memory 紧密耦合内存,ITCM用于指令 AT32未启用，可优化预加载
+// Tightly-Coupled Memory for instruction AT32 not enabled, can optimize preloading
 void initialiseMemorySections(void)
 {
 #ifdef USE_ITCM_RAM

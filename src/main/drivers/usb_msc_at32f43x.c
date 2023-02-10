@@ -217,13 +217,14 @@ uint8_t mscStart(void)
 {
     ledInit(false);
 
-    //Start USB
+    // Start USB
     usbGenerateDisconnectPulse();
 
     IOInit(IOGetByTag(IO_TAG(PA11)), OWNER_USB, 0, 0);
     IOInit(IOGetByTag(IO_TAG(PA12)), OWNER_USB, 0, 0);
-    /* todo sdcard not used
-        switch (blackboxConfig()->device) {
+
+    // The SD card is not supported 
+    /* switch (blackboxConfig()->device) {
     #ifdef USE_SDCARD
         case BLACKBOX_DEVICE_SDCARD:
             USBD_STORAGE_fops = &USBD_MSC_MICRO_SDIO_fops;
@@ -239,6 +240,7 @@ uint8_t mscStart(void)
             return 1;
         }
     */
+
     /* init usb */
     /* usb gpio config */
      msc_usb_gpio_config();
@@ -249,7 +251,7 @@ uint8_t mscStart(void)
      /* select usb 48m clcok source */
      msc_usb_clock48m_select(USB_CLK_HEXT);
 
-     /* enable otgfs irq ，使用NVIC_PRIO_USB(2,0) 优先级，否则会打断SPI dma 传输*/
+     /* enable otgfs irq,Priority NVIC_PRIO_USB must be used */
      nvic_irq_enable(OTG_IRQ, NVIC_PRIO_USB, 0);
 
      usbd_init(&otg_core_struct,

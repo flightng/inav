@@ -44,9 +44,9 @@ tmr_type * usbTxTmr= TMR20;
     to the USB device (flight controller).
 */
 #define APP_RX_DATA_SIZE  2048
-static uint8_t APP_Rx_Buffer[APP_RX_DATA_SIZE]; //接收buffer，将usb的批量读入，转为 usbvcpRead 的逐位读出
-static uint32_t APP_Rx_ptr_out = 0; //serail 读出 ,后指针
-static uint32_t APP_Rx_ptr_in = 0; //usb 读入，前指针
+static uint8_t APP_Rx_Buffer[APP_RX_DATA_SIZE]; //rx buffer,convert usb read to the usbvcpRead
+static uint32_t APP_Rx_ptr_out = 0; //serail read out, back pointer
+static uint32_t APP_Rx_ptr_in = 0; //usb Read in, front pointer
 
 void usbVcpInitHardware(void);
 serialPort_t *usbVcpOpen(void);

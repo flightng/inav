@@ -1,7 +1,7 @@
 /*
  * At32 MSC scsi interface
- * 先实现FLASH emfat 方式读写，后面再实现sd等其他存储读写
- *
+ * FLASH emfat reads and writes are implemented 
+ * Other storage read and write services, such as sd, are not supported
  *
  *
  *
@@ -38,17 +38,6 @@ static const uint8_t scsi_inquiry[MSC_SUPPORT_MAX_LUN][SCSI_INQUIRY_DATA_LENGTH]
 	' ', ' ', ' ' ,' ',                     // Version      : 4 Bytes
   }
 };
-//
-//static const uint8_t STORAGE_Inquirydata[] =
-//{
-//    0x00, 0x80, 0x02, 0x02,
-//    (SCSI_INQUIRY_DATA_LENGTH - 5),
-//    0x00, 0x00, 0x00,
-//    'B', 'E', 'T', 'A', 'F', 'L', 'T', ' ', // Manufacturer : 8 bytes
-//    'O', 'n', 'b', 'o', 'a', 'r', 'd', ' ', // Product      : 16 Bytes
-//    'F', 'l', 'a', 's', 'h', ' ', ' ', ' ', //
-//    ' ', ' ', ' ' ,' ',                     // Version      : 4 Bytes
-//};
 
 usb_sts_type msc_disk_capacity(uint8_t lun, uint32_t *block_num, uint32_t *block_size)
 {

@@ -216,7 +216,6 @@ void IOLo(IO_t io)
 #elif defined(STM32F4)  
     IO_GPIO(io)->BSRRH = IO_Pin(io);
 #elif defined(AT32F43x)
-    // todo BRR ?
     IO_GPIO(io)->clr = IO_Pin(io);  
 #else
     IO_GPIO(io)->BRR = IO_Pin(io);
@@ -373,7 +372,7 @@ void IOConfigGPIO(IO_t io, ioConfig_t cfg)
         return;
     }
     const rccPeriphTag_t rcc = ioPortDefs[IO_GPIOPortIdx(io)].rcc;
-    RCC_ClockCmd(rcc, ENABLE);//todo 
+    RCC_ClockCmd(rcc, ENABLE); 
  
     gpio_init_type init = {
         .gpio_pins = IO_Pin(io),
@@ -393,7 +392,7 @@ void IOConfigGPIOAF(IO_t io, ioConfig_t cfg, uint8_t af)
     }
     const rccPeriphTag_t rcc = ioPortDefs[IO_GPIOPortIdx(io)].rcc;
     RCC_ClockCmd(rcc, ENABLE);
-    // todo  gpio af mux
+    // Must run configure the pin's muxing function
     gpio_pin_mux_config(IO_GPIO(io), IO_GPIO_PinSource(io), af);
 
     gpio_init_type init = {
@@ -441,13 +440,13 @@ IO_t IOGetByTag(ioTag_t tag)
     if (portIdx < 0 || portIdx >= DEFIO_PORT_USED_COUNT) {
         return NULL;
     }
-    // check if pin exists
+    // Check if pin exists
     if (!(ioDefUsedMask[portIdx] & (1 << pinIdx))) {
         return NULL;
     }
-    // count bits before this pin on single port
+    // Count bits before this pin on single port
     int offset = __builtin_popcount(((1 << pinIdx) - 1) & ioDefUsedMask[portIdx]);
-    // and add port offset
+    // Add port offset
     offset += ioDefUsedOffset[portIdx];
     return ioRecs + offset;
 }

@@ -22,11 +22,7 @@
 #define DEF_TIM_DMAMAP__D(dma, stream, channel)         DMA_TAG(dma, stream, channel)
 #define DEF_TIM_DMAMAP__NONE                            DMA_NONE
 
-//DEF_TIM(TMR3,  CH1,  PC6,  TIM_USE_MC_MOTOR ,  0, 0), // S6
-// DEF_TIM_OUTPUT__CH1|0 
-// (TCH_TMR3_CH1,PC6)  =  DEF_TIM_AF__PC6__TCH_TMR3_CH1 =D(2, 3)
-// 0  TMR3_CH1
-// TMR3_CH1 timerHardware_t dmaMuxid
+// Define TIM device/DMA/MUX 
 #define DEF_TIM(tim, ch, pin, usage, flags, dmavar)     {               \
      tim,                                                               \
      IO_TAG(pin),                                                       \
@@ -39,14 +35,11 @@
      DEF_TIM_DMA_REQUEST(tim ## _ ## ch)                                \
   }
 
-// AF mappings TCH_TMR3_CH1 PC6
+// AF mappings
 #define DEF_TIM_AF(timch, pin)        CONCAT(DEF_TIM_AF__, DEF_TIM_AF__ ## pin ## __ ## timch)
-// DEF_TIM_AF__D(2,3) GPIO_MUX_X 查找IO复用表 
+// MUX mappings
 #define DEF_TIM_AF__D(af_n, tim_n)    GPIO_MUX_ ## af_n
 
-// DMA弹性映射
-// BTCH_TMR3_CH1
-//DEF_TIM_DMA_REQ__BTCH_TMR3_CH1
 #define DEF_TIM_DMA_REQUEST(timch) \
     CONCAT(DEF_TIM_DMA_REQ__, DEF_TIM_TCH2BTCH(timch))
 
@@ -54,7 +47,6 @@
 /* add the DMA mappings here */
 // D(DMAx, Stream, Channel)
 // at32f43x has DMAMUX that allow arbitrary assignment of peripherals to streams.
-//DMA_TAG
 #define DEF_TIM_DMA_FULL \
     D(1, 1, 0), D(1, 2, 0), D(1, 3, 0), D(1, 4, 0), D(1, 5, 0), D(1, 6, 0), D(1, 7, 0), \
     D(2, 1, 0), D(2, 2, 0), D(2, 3, 0), D(2, 4, 0), D(2, 5, 0), D(2, 6, 0), D(2, 7, 0)
@@ -175,7 +167,7 @@
 #define DEF_TIM_DMA_REQ__BTCH_TMR20_UP    DMAMUX_DMAREQ_ID_TMR20_OVERFLOW
 
 
-// AF table todo need chang ★
+// AF table 
 //GPIOA
 #define DEF_TIM_AF__PA0__TCH_TMR2_CH1     D(1, 2)    //A MUX1 1
 #define DEF_TIM_AF__PA1__TCH_TMR2_CH2     D(1, 2)    //A MUX1 2

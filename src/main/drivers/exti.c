@@ -51,7 +51,7 @@ static const uint8_t extiGroupIRQn[EXTI_IRQ_GROUPS] = {
 #define EXTI_REG_IMR (EXTI_D1->IMR1)
 #define EXTI_REG_PR  (EXTI_D1->PR1)
 #elif defined(AT32F43x)  
-// todo 中断使能寄存器 中断状态寄存器
+// Interrupt enable register & interrupt status register
 #define EXTI_REG_IMR (EXINT->inten)
 #define EXTI_REG_PR  (EXINT->intsts)
 #else
@@ -123,7 +123,7 @@ void EXTIConfig(IO_t io, extiCallbackRec_t *cb, int irqPriority, exint_polarity_
     scfg_exint_line_config(IO_EXTI_PortSourceGPIO(io), IO_EXTI_PinSource(io));
     uint32_t extiLine = IO_EXTI_Line(io);   
     exint_flag_clear(extiLine);
-     //todo 
+    
     exint_init_type EXTIInit;
     exint_default_para_init(&EXTIInit);
     EXTIInit.line_mode = EXINT_LINE_INTERRUPUT;
@@ -231,7 +231,7 @@ void EXTI_IRQHandler(void)
     /**/
 
 
-#if defined(AT32F43x)  //TODO 
+#if defined(AT32F43x) 
 _EXTI_IRQ_HANDLER(EXINT0_IRQHandler);
 _EXTI_IRQ_HANDLER(EXINT1_IRQHandler); 
 _EXTI_IRQ_HANDLER(EXINT2_IRQHandler);  

@@ -54,7 +54,7 @@ typedef uint32_t timCNT_t;
 #else
 #error "Unknown CPU defined"
 #endif
-//  tmr_type todo 
+//  tmr_type instead in AT32 
 #if defined(AT32F43x)
 typedef struct timerDef_s {
     tmr_type   * tim;

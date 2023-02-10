@@ -187,7 +187,6 @@ static void do_jump(uint32_t address)
 void bootloader_jump_to_app(void)
 {
     #if defined(AT32F43x)
-        //todo 
         /*Close Peripherals Clock*/
         CRM->apb2rst = 0xFFFF;
         CRM->apb2rst = 0;
@@ -237,16 +236,13 @@ void bootloader_jump_to_app(void)
 // returns -1 if not found
 int8_t mcuFlashAddressSectorIndex(uint32_t address)
 {
-    // at32 0x08000000UL
     uint32_t sectorStartAddress = FLASH_START_ADDRESS;
     uint8_t sector = 0;
     flashSectorDef_t *sectorDef = flashSectors;
 
     do {
         for (unsigned j = 0; j < sectorDef->count; ++j) {
-            // 获取地址所在的扇区 起始地址+扇区*（4/2）K
             uint32_t sectorEndAddress = sectorStartAddress + sectorDef->size * 1024;
-            /*if ((CONFIG_START_ADDRESS >= sectorStartAddress) && (CONFIG_START_ADDRESS < sectorEndAddress) && (CONFIG_END_ADDRESS <= sectorEndAddress)) {*/
             if ((address >= sectorStartAddress) && (address < sectorEndAddress)) {
                 return sector;
             }
@@ -414,7 +410,7 @@ bool flash(flashOperation_e flashOperation)
     if (afatfs_fseekSync(flashDataFile, sizeof(buffer), AFATFS_SEEK_SET) == AFATFS_OPERATION_FAILURE) {
         goto flashFailed;
     }
-    // 刷入固件    
+    // Write MCU flash    
     while (!afatfs_feof(flashDataFile)) {
 
         if ((flashOperation == FLASH_OPERATION_UPDATE) && (flashDstAddress == CONFIG_START_ADDRESS)) {
@@ -428,7 +424,7 @@ bool flash(flashOperation_e flashOperation)
         }
 
         afatfs_freadSync(flashDataFile, (uint8_t *)&buffer, sizeof(buffer));
-        // 读取SD卡文件写入内部存储器    
+        // Write SD card files to MCU flash    
         if (!mcuFlashWriteWord(flashDstAddress, buffer)) {
             goto flashFailed;
         }
@@ -501,7 +497,7 @@ flashFailed:
 }
 
 #if defined(USE_FLASHFS)
-// 格式化存储
+// Erase falsh
 bool dataflashChipEraseUpdatePartition(void)
 {
     flashPartition_t *flashDataPartition = flashPartitionFindByType(FLASH_PARTITION_TYPE_UPDATE_FIRMWARE);
@@ -526,7 +522,7 @@ bool dataflashChipEraseUpdatePartition(void)
     return true;
 }
 #endif
-// 从SD或者FLASH刷新系统 
+// Refresh from SD or FLASH
 int main(void)
 {
     init();

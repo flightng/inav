@@ -56,10 +56,7 @@ static void usartConfigurePinInversion(uartPort_t *uartPort) {
 }
 
 static void uartReconfigure(uartPort_t *uartPort)
-{
-    //USART_InitTypeDef USART_InitStructure;
-   // USART_Cmd(uartPort->USARTx, DISABLE);
-
+{ 
     usart_enable(uartPort->USARTx, FALSE);
     uint32_t baud_rate =  115200;
     usart_data_bit_num_type data_bit = USART_DATA_8BITS;
@@ -94,7 +91,6 @@ static void uartReconfigure(uartPort_t *uartPort)
     else
         usart_single_line_halfduplex_select(uartPort->USARTx, FALSE);
 
-    //USART_Cmd(uartPort->USARTx, ENABLE);
      usart_enable(uartPort->USARTx, TRUE);
 }
 
@@ -154,21 +150,15 @@ serialPort_t *uartOpen(usart_type *USARTx, serialReceiveCallbackPtr rxCallback, 
     uartReconfigure(s);
 
     if (mode & MODE_RX) {
-        // todo USART_IT_RXNE ==USART_RDBF_FLAG
-        //USART_ClearITPendingBit(s->USARTx, USART_IT_RXNE);
-        //todo USART_ClearITPendingBit
         usart_flag_clear(s->USARTx, USART_RDBF_FLAG);
-        //USART_ITConfig(s->USARTx, USART_IT_RXNE, ENABLE);
         usart_interrupt_enable (s->USARTx, USART_RDBF_INT, TRUE);
 
     }
 
     if (mode & MODE_TX) {
-        //USART_ITConfig(s->USARTx, USART_IT_TXE, ENABLE);
         usart_interrupt_enable (s->USARTx, USART_TDBE_INT, TRUE);
 
     }
-    //USART_Cmd(s->USARTx, ENABLE);
     usart_enable(s->USARTx, TRUE);
 
     return (serialPort_t *)s;
@@ -245,7 +235,6 @@ void uartWrite(serialPort_t *instance, uint8_t ch)
         s->port.txBufferHead++;
     }
 
-  //  USART_ITConfig(s->USARTx, USART_IT_TXE, ENABLE);
     usart_interrupt_enable (s->USARTx, USART_TDBE_INT, TRUE);
 
 }
@@ -253,7 +242,6 @@ void uartWrite(serialPort_t *instance, uint8_t ch)
 bool isUartIdle(serialPort_t *instance)
 {
     uartPort_t *s = (uartPort_t *)instance;
-    //if(USART_GetFlagStatus(s->USARTx, USART_FLAG_IDLE)) {
     if(usart_flag_get(s->USARTx, USART_IDLEF_FLAG)) {
 
         uartClearIdleFlag(s);

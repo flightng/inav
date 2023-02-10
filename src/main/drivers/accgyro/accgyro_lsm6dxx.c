@@ -203,7 +203,7 @@ static bool lsm6dxxGyroRead(gyroDev_t *gyro)
     return true;
 }
 
-// 先初始化Gyro设备，后检测Acc
+// Init Gyro first,then Acc
 bool lsm6dGyroDetect(gyroDev_t *gyro)
 {
     gyro->busDev = busDeviceInit(BUSTYPE_SPI, DEVHW_LSM6D, gyro->imuSensorToUse, OWNER_MPU);

@@ -173,7 +173,7 @@ void timerChConfigIC(TCH_t * tch, bool polarityRising, unsigned inputFilterSampl
 uint16_t timerGetPeriod(TCH_t * tch)
 {
 #if defined(AT32F43x)
-    return tch->timHw->tim->pr;     // todo pr周期寄存器
+    return tch->timHw->tim->pr;     //tmr pr registe
 #else
     return tch->timHw->tim->ARR;
 #endif
@@ -191,7 +191,6 @@ void timerInit(void)
 
     /* Before 2.0 timer outputs were initialized to IOCFG_AF_PP_PD even if not used */
     /* To keep compatibility make sure all timer output pins are mapped to INPUT with weak pull-down */
-    // todo GPIO_OUTPUT_PUSH_PULL
     for (int i = 0; i < timerHardwareCount; i++) {
         const timerHardware_t *timerHardwarePtr = &timerHardware[i];
         IOConfigGPIO(IOGetByTag(timerHardwarePtr->tag), IOCFG_IPD);

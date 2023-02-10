@@ -168,7 +168,7 @@ bool spiInitDevice(SPIDevice device, bool leadingEdge)
     }
     spi_init(spi->dev, &spi_init_struct);
     spi_crc_polynomial_set (spi->dev, 0x07);
-    spi_crc_enable (spi->dev, TRUE); // 开启校验
+    spi_crc_enable (spi->dev, TRUE); // enable crc
     spi_enable (spi->dev, TRUE);
 
     if (spi->nss) {

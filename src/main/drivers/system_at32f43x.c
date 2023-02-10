@@ -107,7 +107,6 @@ bool isMPUSoftReset(void)
     else
         return false;
 }
-//AT32 图 2-1 AT32F435/437地址配置 == system_isr_vector_table_base ? 
 //AT32 DIAGRAM2-1 AT32F435/437 DFU BOOTLOADER ADDR
 uint32_t systemBootloaderAddress(void)
 {

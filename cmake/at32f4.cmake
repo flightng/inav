@@ -7,7 +7,6 @@ set(AT32F4_CMSIS_DEVICE_DIR "${MAIN_LIB_DIR}/main/AT32F43x/Drivers/CMSIS/Device/
 set(AT32F4_CMSIS_DRIVERS_DIR "${MAIN_LIB_DIR}/main/AT32F43x/Drivers/CMSIS")
 
   
-# TODO  
 set(AT32F4_STDPERIPH_SRC_EXCLUDES
         at32f435_437_can.c
         at32f435_437_dvp.c

@@ -10,7 +10,7 @@ message("-- DEBUG_HARDFAULTS: ${DEBUG_HARDFAULTS}, SEMIHOSTING: ${SEMIHOSTING}")
 
 set(CMSIS_DIR "${MAIN_LIB_DIR}/lib/main/AT32F43x/Drivers/CMSIS")
 set(CMSIS_INCLUDE_DIR "${CMSIS_DIR}/cm4/core_support") 
-# TODO:DSP use common
+# DSP use common
 set(CMSIS_DSP_DIR "${MAIN_LIB_DIR}/main/CMSIS/DSP")
 set(CMSIS_DSP_INCLUDE_DIR "${CMSIS_DSP_DIR}/Include")
 
@@ -33,7 +33,7 @@ main_sources(AT32_VCP_SRC
     drivers/serial_usb_vcp_at32f43x.c
     drivers/usb_io.c
 )
-# TODO: Not used
+# SDCARD not supported yet
 main_sources(AT32_SDCARD_SRC
     drivers/sdcard/sdcard.c
     drivers/sdcard/sdcard_spi.c
@@ -91,7 +91,7 @@ set(AT32_LINK_OPTIONS
     -Wl,--no-wchar-size-warning
     -Wl,--print-memory-usage
 )
-# TODO 解析target
+# Get target features
 macro(get_at32_target_features output_var dir target_name)
     execute_process(COMMAND "${CMAKE_C_COMPILER}" -E -dD -D${ARGV2} "${ARGV1}/target.h"
         ERROR_VARIABLE _errors
@@ -262,7 +262,7 @@ function(add_at32_executable)
     endif()
 endfunction()
 
-#  AT32主入口
+#  Main function of AT32 
 function(target_at32)
     if(NOT arm-none-eabi STREQUAL TOOLCHAIN)
         return()
@@ -362,7 +362,6 @@ function(target_at32)
 
     if(args_BOOTLOADER)
         # Bootloader for the target
-        # TODO target/link/at32_flash_f43xM_bl.ld 
         set(bl_suffix _bl)
         add_at32_executable(
             NAME ${name}${bl_suffix}

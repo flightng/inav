@@ -44,7 +44,7 @@
 
 #define BEEPER                  PB11
 #define BEEPER_INVERTED
-#define BEEPER_PWM_FREQUENCY	2500 //0  有源bb响 | 2500Hz 无源bb响，PWM驱动 
+#define BEEPER_PWM_FREQUENCY	2500 //0  Active BB | 2500Hz Passive BB 
 
 // *************** Gyro & ACC **********************
 #define USE_SPI
@@ -106,11 +106,11 @@
 #define USE_MAG_HMC5883
 #define USE_MAG_QMC5883
  
-// todo temp sensors
+// temperature sensors
 //#define TEMPERATURE_I2C_BUS     BUS_I2C1
 // air speed sensors
 //#define PITOT_I2C_BUS           BUS_I2C1
-// 测距仪
+// ranger sensors
 //#define USE_RANGEFINDER
 //#define RANGEFINDER_I2C_BUS         BUS_I2C1
  
@@ -177,7 +177,7 @@
 // *************** ADC *****************************
 #define USE_ADC
 #define ADC_INSTANCE                ADC1
-// todo
+
 #define ADC1_DMA_STREAM             DMA2_CHANNEL5
 #define ADC_CHANNEL_1_PIN           PB0
 #define ADC_CHANNEL_2_PIN           PB1
@@ -191,7 +191,7 @@
 #define USE_LED_STRIP
 #define WS2811_PIN                      PB10   //TIM2_CH3
 
-// 遥测
+// telemetry
 #define USE_SPEKTRUM_BIND
 #define BIND_PIN                   PA3    //UART2_RX_PIN
 

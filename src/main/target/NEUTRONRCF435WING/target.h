@@ -104,11 +104,11 @@
 #define USE_MAG_QMC5883
 #define DEFAULT_I2C_BUS         BUS_I2C2
 
-// todo temp sensors
+// temperature sensors
 //#define TEMPERATURE_I2C_BUS     BUS_I2C1
 // air speed sensors
 //#define PITOT_I2C_BUS           BUS_I2C1
-// 测距仪
+// ranger sensors
 //#define USE_RANGEFINDER
 //#define RANGEFINDER_I2C_BUS         BUS_I2C1
  
@@ -171,7 +171,7 @@
 // *************** ADC *****************************
 #define USE_ADC
 #define ADC_INSTANCE                ADC1
-// todo
+
 #define ADC1_DMA_STREAM             DMA2_CHANNEL5
 #define ADC_CHANNEL_1_PIN           PA0
 #define ADC_CHANNEL_2_PIN           PA1
@@ -185,7 +185,7 @@
 // #define USE_LED_STRIP
 // #define WS2811_PIN                      PB10   //TIM2_CH3
 
-// // 遥测
+// telemetry
 // #define USE_SPEKTRUM_BIND
 // #define BIND_PIN                   PA3    //UART2_RX_PIN
 

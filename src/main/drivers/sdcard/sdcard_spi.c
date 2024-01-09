@@ -857,7 +857,11 @@ void sdcardSpi_init(void)
 
     // Transmit at least 74 dummy clock cycles with CS high so the SD card can start up
     IOHi(sdcard.dev->busdev.spi.csnPin);
+#if defined(AT32F43x)
+    spi_type * instance = spiInstanceByDevice(sdcard.dev->busdev.spi.spiBus);
+#else
     SPI_TypeDef * instance = spiInstanceByDevice(sdcard.dev->busdev.spi.spiBus);
+#endif
     spiTransfer(instance, NULL, NULL, SDCARD_INIT_NUM_DUMMY_BYTES);
 
     // Wait for that transmission to finish before we enable the SDCard, so it receives the required number of cycles:

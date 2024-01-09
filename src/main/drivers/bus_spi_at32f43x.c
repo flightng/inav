@@ -149,6 +149,9 @@ SPIDevice spiDeviceByInstance(spi_type *instance)
     if (instance == SPI3)
         return SPIDEV_3;
 
+    if (instance == SPI4)
+        return SPIDEV_4;
+
     return SPIINVALID;
 }
 

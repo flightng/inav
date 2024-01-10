@@ -90,9 +90,9 @@
 #define IMU_BMI088_ALIGN        CW0_DEG
 #define BMI088_SPI_BUS          BUS_SPI1
 
-#define BMI088_GYRO_CS_PIN      SPI1_NSS_PIN
+#define BMI088_GYRO_CS_PIN      PC14
 #define BMI088_GYRO_EXTI_PIN    PA15
-#define BMI088_ACC_CS_PIN       PC13
+#define BMI088_ACC_CS_PIN       SPI1_NSS_PIN
 #define BMI088_ACC_EXTI_PIN     PD13
 
 // *************** I2C/Baro/Mag/EXT*********************

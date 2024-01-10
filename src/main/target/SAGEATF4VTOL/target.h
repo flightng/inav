@@ -89,9 +89,9 @@
 #define IMU_BMI088_ALIGN        CW0_DEG
 #define BMI088_SPI_BUS          BUS_SPI1
 
-#define BMI088_GYRO_CS_PIN      SPI1_NSS_PIN
+#define BMI088_GYRO_CS_PIN      PC14
 #define BMI088_GYRO_EXTI_PIN    PA15
-#define BMI088_ACC_CS_PIN       PC14
+#define BMI088_ACC_CS_PIN       SPI1_NSS_PIN
 #define BMI088_ACC_EXTI_PIN     PD13
 
 // *************** I2C/Baro/Mag/EXT*********************
@@ -145,7 +145,7 @@
 #define SPI4_SCK_PIN            PE2
 #define SPI4_MISO_PIN   	    PE5
 #define SPI4_MOSI_PIN   	    PE6
-#define SPI4_NSS_PIN 			PE4 //confirm on lqfp64
+#define SPI4_NSS_PIN 			PE4
 
 #define SPI4_SCK_AF      GPIO_MUX_5
 #define SPI4_MISO_AF     GPIO_MUX_5

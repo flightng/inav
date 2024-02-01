@@ -23,6 +23,14 @@
 #include "drivers/io.h"
 #include "drivers/pwm_mapping.h"
 #include "drivers/timer.h"
+#include "drivers/sensor.h"
+
+
+BUSDEV_REGISTER_SPI_TAG(busdev_bmi088_gyro, DEVHW_BMI088_GYRO,  BMI088_SPI_BUS,     BMI088_GYRO_CS_PIN, NONE,       0,  DEVFLAGS_NONE,  IMU_BMI088_ALIGN);
+BUSDEV_REGISTER_SPI_TAG(busdev_bmi088_acc,  DEVHW_BMI088_ACC,   BMI088_SPI_BUS,     BMI088_ACC_CS_PIN,  NONE,       0,  DEVFLAGS_NONE,  IMU_BMI088_ALIGN);
+BUSDEV_REGISTER_SPI_TAG(busdev_icm42605,    DEVHW_ICM42605,     ICM42605_SPI_BUS,   ICM42605_CS_PIN,    NONE,       1,  DEVFLAGS_NONE,  IMU_ICM42605_ALIGN);
+BUSDEV_REGISTER_SPI_TAG(busdev_bmi270,      DEVHW_BMI270,       BMI270_SPI_BUS,     BMI270_CS_PIN,      NONE,       1, DEVFLAGS_NONE,  IMU_BMI270_ALIGN);
+
 
 timerHardware_t timerHardware[] = {
 

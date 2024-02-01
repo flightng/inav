@@ -54,41 +54,34 @@
 #define SPI1_MOSI_PIN           PA7
 #define SPI1_NSS_PIN            PA4
 
-// MPU6000
-#define USE_IMU_MPU6000
-#define IMU_MPU6000_ALIGN       CW0_DEG
-#define MPU6000_SPI_BUS         BUS_SPI1
-#define MPU6000_CS_PIN          SPI1_NSS_PIN
-// MPU6500
-#define USE_IMU_MPU6500
-#define IMU_MPU6500_ALIGN       CW0_DEG 
-#define MPU6500_SPI_BUS         BUS_SPI1
-#define MPU6500_CS_PIN          SPI1_NSS_PIN
+#define USE_SPI_DEVICE_3
+#define SPI3_SCK_PIN            PC10
+#define SPI3_MISO_PIN   	    PC11
+#define SPI3_MOSI_PIN   	    PC12
+#define SPI3_NSS_PIN 			PD6 //confirm on lqfp64
+
+
+#define USE_TARGET_IMU_HARDWARE_DESCRIPTORS
+#define USE_DUAL_GYRO
+#define SETTING_GYRO_TO_USE_DEFAULT 0 
 
 // ICM42605/ICM42688P
 #define USE_IMU_ICM42605
 #define IMU_ICM42605_ALIGN      CW0_DEG
-#define ICM42605_SPI_BUS        BUS_SPI1
-#define ICM42605_CS_PIN         SPI1_NSS_PIN
-
-// MPU9250   
-#define USE_IMU_MPU9250
-#define IMU_MPU9250_ALIGN       CW0_DEG
-#define MPU9250_SPI_BUS         BUS_SPI1
-#define MPU9250_CS_PIN          SPI1_NSS_PIN
+#define ICM42605_SPI_BUS        BUS_SPI3
+#define ICM42605_CS_PIN         SPI3_NSS_PIN
 
 // BMI270
 #define USE_IMU_BMI270
-#define IMU_BMI270_ALIGN        CW90_DEG
-#define BMI270_SPI_BUS          BUS_SPI1
-#define BMI270_CS_PIN           SPI1_NSS_PIN
+#define IMU_BMI270_ALIGN        CW0_DEG
+#define BMI270_SPI_BUS          BUS_SPI3
+#define BMI270_CS_PIN           SPI3_NSS_PIN
 
 //BMI088
 #define USE_IMU_BMI088
 
 #define IMU_BMI088_ALIGN        CW0_DEG
 #define BMI088_SPI_BUS          BUS_SPI1
-
 #define BMI088_GYRO_CS_PIN      PC14
 #define BMI088_GYRO_EXTI_PIN    PA15
 #define BMI088_ACC_CS_PIN       SPI1_NSS_PIN
@@ -135,11 +128,6 @@
 
 
 // *************** SD/BLACKBOX **************************
-#define USE_SPI_DEVICE_3
-#define SPI3_SCK_PIN            PC10
-#define SPI3_MISO_PIN   	    PC11
-#define SPI3_MOSI_PIN   	    PC12
-#define SPI3_NSS_PIN 			PD6 //confirm on lqfp64
 
 #define USE_SPI_DEVICE_4
 #define SPI4_SCK_PIN            PE2
@@ -151,20 +139,19 @@
 #define SPI4_MISO_AF     GPIO_MUX_5
 #define SPI4_MOSI_AF     GPIO_MUX_5
   
-#define ENABLE_BLACKBOX_LOGGING_ON_SPIFLASH_BY_DEFAULT
-#define USE_FLASHFS
-#define USE_FLASH_M25P16
-#define M25P16_SPI_BUS          BUS_SPI3
-#define M25P16_CS_PIN           SPI3_NSS_PIN
+// #define ENABLE_BLACKBOX_LOGGING_ON_SPIFLASH_BY_DEFAULT
+// #define USE_FLASHFS
+// #define USE_FLASH_M25P16
+// #define M25P16_SPI_BUS          BUS_SPI3
+// #define M25P16_CS_PIN           SPI3_NSS_PIN
 
-#define USE_FLASH_W25N01G
-#define W25N01G_SPI_BUS         BUS_SPI3
-#define W25N01G_CS_PIN          SPI3_NSS_PIN
-
-
+// #define USE_FLASH_W25N01G
+// #define W25N01G_SPI_BUS         BUS_SPI3
+// #define W25N01G_CS_PIN          SPI3_NSS_PIN
+#define ENABLE_BLACKBOX_LOGGING_ON_SDCARD_BY_DEFAULT 
 #define USE_SDCARD
 #define USE_SDCARD_SPI
-#define SDCARD_DETECT_INVERTED
+// #define SDCARD_DETECT_INVERTED
 #define SDCARD_DETECT_PIN       PE3
 #define SDCARD_SPI_BUS          BUS_SPI4
 #define SDCARD_CS_PIN           SPI4_NSS_PIN
@@ -212,7 +199,7 @@
 #define CURRENT_METER_ADC_CHANNEL   ADC_CHN_2
 //#define RSSI_ADC_CHANNEL            ADC_CHN_3 
 
-#define DEFAULT_FEATURES        (FEATURE_TX_PROF_SEL | FEATURE_CURRENT_METER | FEATURE_TELEMETRY| FEATURE_VBAT | FEATURE_OSD )
+#define DEFAULT_FEATURES        (FEATURE_TX_PROF_SEL | FEATURE_CURRENT_METER | FEATURE_TELEMETRY| FEATURE_VBAT | FEATURE_OSD |FEATURE_BLACKBOX)
 
 #define USE_LED_STRIP
 #define WS2811_PIN                      PB10   //TIM2_CH3
